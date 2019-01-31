@@ -25,13 +25,18 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,9 +77,39 @@ public class start_main extends AppCompatActivity {
             current_uid = uid1;
         }
 
-        // Add
-        //init_table();
-        Button addRowButton = (Button)findViewById(R.id.table_layout_add_row_button);
+        Button getRowButton = (Button) findViewById(R.id.table_layout_get_row_button);
+        getRowButton.setOnClickListener(new View.OnClickListener() {
+            List<String> photos = new ArrayList<String>();
+            @Override public void onClick(View v) {
+                Log.v(TAG, "Get Database entries");
+                String cp = "User/Photos/" + current_user;
+                db.collection(cp)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Map<String, Object> map = document.getData();
+                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                            //Log.d(TAG, entry.getKey().toString());
+                                            Log.d(TAG, entry.getValue().toString());
+                                            photos.add(entry.getValue().toString());
+                                        }
+                                        addRow(photos);
+                                        photos.clear();
+                                    }
+                                } else {
+                                    Log.w(TAG, "Error getting documents.", task.getException());
+                                }
+                            }
+                        });
+            }
+        });
+
+
+        Button addRowButton = (Button) findViewById(R.id.table_layout_add_row_button);
         addRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,52 +117,60 @@ public class start_main extends AppCompatActivity {
                 TableRow tbrow = new TableRow(start_main.this);
                 Log.v(TAG, "Adding Row");
                 tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                       TableRow.LayoutParams.WRAP_CONTENT));
+                        TableRow.LayoutParams.WRAP_CONTENT));
 
                 TextView t1v = new EditText(context);
-                t1v.setText("No."); t1v.setTextColor(Color.BLUE); t1v.setGravity(Gravity.START);
+                t1v.setText("No.");
+                t1v.setTextColor(Color.BLUE);
+                t1v.setGravity(Gravity.START);
                 TableRow.LayoutParams lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT);
-                lparams.weight=0.75f; lparams.width=0;
+                lparams.weight = 0.75f;
+                lparams.width = 0;
                 t1v.setLayoutParams(lparams);
-                tbrow.addView(t1v,0);
+                tbrow.addView(t1v, 0);
 
                 TextView t2v = new EditText(context);
-                t2v.setText("Passport Size"); t2v.setTextColor(Color.BLUE); t2v.setGravity(Gravity.START);
+                t2v.setText("Passport Size");
+                t2v.setTextColor(Color.BLUE);
+                t2v.setGravity(Gravity.START);
                 lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT);
-                lparams.weight=2; lparams.width=0;
+                lparams.weight = 2;
+                lparams.width = 0;
                 t2v.setLayoutParams(lparams);
-                tbrow.addView(t2v,1);
+                tbrow.addView(t2v, 1);
 
                 // Add a checkbox in the third column.
-                CheckBox checkBox = new CheckBox(context); checkBox.setGravity(Gravity.RIGHT);
+                CheckBox checkBox = new CheckBox(context);
+                checkBox.setGravity(Gravity.RIGHT);
                 lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.WRAP_CONTENT);
-                lparams.weight=0.5f; lparams.width=0;
+                lparams.weight = 0.5f;
+                lparams.width = 0;
                 checkBox.setLayoutParams(lparams);
-                tbrow.addView(checkBox,2);
+                tbrow.addView(checkBox, 2);
 
                 stk.addView(tbrow);
                 tbrow.setBackgroundResource(R.drawable.row_border);
             }
         });
 
-        Button saveRowButton = (Button)findViewById(R.id.table_layout_save_row_button);
+        Button saveRowButton = (Button) findViewById(R.id.table_layout_save_row_button);
         saveRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int rowCount = stk.getChildCount();
                 for (int i = 0; i < rowCount; i++) {
                     View rowView = stk.getChildAt(i);
-                    if(rowView instanceof TableRow) {
-                        TableRow tableRow = (TableRow)rowView;
+                    if (rowView instanceof TableRow) {
+                        TableRow tableRow = (TableRow) rowView;
                         int columnCount = tableRow.getChildCount();
-                        for(int j = 0;j<columnCount;j++){
+                        for (int j = 0; j < columnCount; j++) {
                             View columnView = tableRow.getChildAt(j);
-                            if(columnView instanceof CheckBox) {
-                                CheckBox checkboxView = (CheckBox)columnView;
-                                if(checkboxView.isChecked()) {
+                            if (columnView instanceof CheckBox) {
+                                CheckBox checkboxView = (CheckBox) columnView;
+                                if (checkboxView.isChecked()) {
                                     TextView v1 = (TextView) tableRow.getChildAt(0);
                                     Log.v(TAG, "ID: " + v1.getText().toString());
                                     TextView v2 = (TextView) tableRow.getChildAt(1);
@@ -144,7 +187,7 @@ public class start_main extends AppCompatActivity {
         });
 
         // Get delete table row button.
-        Button deleteRowButton = (Button)findViewById(R.id.table_layout_delete_row_button);
+        Button deleteRowButton = (Button) findViewById(R.id.table_layout_delete_row_button);
         deleteRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,23 +197,20 @@ public class start_main extends AppCompatActivity {
                 // Save delete row number list.
                 List<Integer> deleteRowNumberList = new ArrayList<Integer>();
                 // Loope each table rows.
-                for(int i =0 ;i < rowCount;i++)
-                {
+                for (int i = 0; i < rowCount; i++) {
                     // Get table row.
                     View rowView = stk.getChildAt(i);
-                    if(rowView instanceof TableRow)
-                    {
-                        TableRow tableRow = (TableRow)rowView;
+                    if (rowView instanceof TableRow) {
+                        TableRow tableRow = (TableRow) rowView;
                         // Get row column count.
                         int columnCount = tableRow.getChildCount();
                         // Loop all columns in row.
-                        for(int j = 0;j<columnCount;j++){
+                        for (int j = 0; j < columnCount; j++) {
                             View columnView = tableRow.getChildAt(j);
-                            if(columnView instanceof CheckBox) {
+                            if (columnView instanceof CheckBox) {
                                 // If columns is a checkbox and checked then save the row number in list.
-                                CheckBox checkboxView = (CheckBox)columnView;
-                                if(checkboxView.isChecked())
-                                {
+                                CheckBox checkboxView = (CheckBox) columnView;
+                                if (checkboxView.isChecked()) {
                                     deleteRowNumberList.add(i);
                                     break;
                                 }
@@ -180,51 +220,92 @@ public class start_main extends AppCompatActivity {
                 }
 
                 // Remove all rows by the selected row number.
-                for(int rowNumber :deleteRowNumberList)
-                {
-                    stk.removeViewAt(rowNumber); return;
+                for (int rowNumber : deleteRowNumberList) {
+                    stk.removeViewAt(rowNumber);
+                    return;
                 }
             }
         });
     }
 
+    private void addRow(List<String> photos) {
+        // Create a new table row.
+        TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
+
+        for (String val : photos) {
+
+        }
+        TableRow tbrow = new TableRow(start_main.this);
+        Log.v(TAG, "Adding Row");
+        tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT));
+
+        TextView t1v = new EditText(context);
+        t1v.setText(photos.get(0));
+        t1v.setTextColor(Color.BLUE);
+        t1v.setGravity(Gravity.START);
+        TableRow.LayoutParams lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.weight = 0.75f;
+        lparams.width = 0;
+        t1v.setLayoutParams(lparams);
+        tbrow.addView(t1v, 0);
+
+        TextView t2v = new EditText(context);
+        t2v.setText(photos.get(1));
+        t2v.setTextColor(Color.BLUE);
+        t2v.setGravity(Gravity.START);
+        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.weight = 2;
+        lparams.width = 0;
+        t2v.setLayoutParams(lparams);
+        tbrow.addView(t2v, 1);
+
+        // Add a checkbox in the third column.
+        CheckBox checkBox = new CheckBox(context);
+        checkBox.setGravity(Gravity.RIGHT);
+        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.weight = 0.5f;
+        lparams.width = 0;
+        checkBox.setLayoutParams(lparams);
+        tbrow.addView(checkBox, 2);
+
+        stk.addView(tbrow);
+        tbrow.setBackgroundResource(R.drawable.row_border);
+    }
+
     private void addNewContact() {
-        Log.v("TAG", "Adding Contact to DB");
+        Log.v(TAG, "Adding Contact to DB");
         Map<String, String> newContact = new HashMap<>();
         newContact.put("Name", current_user);
         newContact.put("id", current_uid);
-        /*
-        DocumentReference docId = db.collection("User").document(current_user);
-        String val = docId.getId();
-        Toast.makeText(start_main.this, "DocId: " + val, Toast.LENGTH_SHORT).show();
-        Log.v("TAG", "Contact : " + docId);
-        */
-        //db.collection("User").document("Contacts").set(newContact)
         db.collection("User").document(current_user).set(newContact)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override public void onSuccess(Void aVoid) {
                         Toast.makeText(start_main.this, "User Registered",
                                 Toast.LENGTH_SHORT).show();
-                        Log.v("TAG", "Added Contact to DB");
+                        Log.v(TAG, "Added Contact to DB");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override public void onFailure(@NonNull Exception e) {
                         Toast.makeText(start_main.this, "ERROR" + e.toString(),
                                 Toast.LENGTH_SHORT).show();
-                        Log.v("TAG", e.toString());
+                        Log.v(TAG, e.toString());
                     }
                 });
     }
 
     private void addNewPhoto(String photoNo, String photoText) {
-        Log.v("TAG", "Adding Photo to DB");
+        Log.v(TAG, "Adding Photo to DB");
         Map<String, String> newPhoto = new HashMap<>();
         newPhoto.put("photoNo", photoNo);
         newPhoto.put("photoText", photoText);
         String docId = db.collection("User").document(current_user).getId();
         String cp = "User/Photos/" + docId;
-        Log.v("TAG", "Sub Collection at: " + cp);
+        Log.v(TAG, "Sub Collection at: " + cp);
         db.collection(cp).document().set(newPhoto)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override public void onSuccess(Void aVoid) {
@@ -237,7 +318,7 @@ public class start_main extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(start_main.this, "ERROR" + e.toString(),
                                 Toast.LENGTH_SHORT).show();
-                        Log.v("TAG", e.toString());
+                        Log.v(TAG, e.toString());
                     }
                 });
     }

@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -22,11 +23,19 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static android.view.ViewGroup.LayoutParams.FILL_PARENT;
 
@@ -34,12 +43,16 @@ public class start_main extends AppCompatActivity {
     private static final String TAG = "SMMainActivity";
     FirebaseUser user;
     private Context context = null;
+    FirebaseFirestore db;
+    String current_user, current_uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_main_new);
         context = getApplicationContext();
+        db = FirebaseFirestore.getInstance();
+
         final TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
         setTitle("Photo Shop");
 
@@ -51,11 +64,15 @@ public class start_main extends AppCompatActivity {
         String value1 = extras.getString("user1");
         if (value1 != null) {
             Log.v(TAG, "user found: " + value1);
+            current_user = value1;
         }
         String uid1 = extras.getString("uid1");
         if (value1 != null) {
             Log.v(TAG, "UID: " + uid1);
+            current_uid = uid1;
         }
+
+        // Add
         //init_table();
         Button addRowButton = (Button)findViewById(R.id.table_layout_add_row_button);
         addRowButton.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +110,36 @@ public class start_main extends AppCompatActivity {
 
                 stk.addView(tbrow);
                 tbrow.setBackgroundResource(R.drawable.row_border);
+            }
+        });
+
+        Button saveRowButton = (Button)findViewById(R.id.table_layout_save_row_button);
+        saveRowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int rowCount = stk.getChildCount();
+                for (int i = 0; i < rowCount; i++) {
+                    View rowView = stk.getChildAt(i);
+                    if(rowView instanceof TableRow) {
+                        TableRow tableRow = (TableRow)rowView;
+                        int columnCount = tableRow.getChildCount();
+                        for(int j = 0;j<columnCount;j++){
+                            View columnView = tableRow.getChildAt(j);
+                            if(columnView instanceof CheckBox) {
+                                CheckBox checkboxView = (CheckBox)columnView;
+                                if(checkboxView.isChecked()) {
+                                    TextView v1 = (TextView) tableRow.getChildAt(0);
+                                    Log.v(TAG, "ID: " + v1.getText().toString());
+                                    TextView v2 = (TextView) tableRow.getChildAt(1);
+                                    Log.v(TAG, "Photo: " + v2.getText().toString());
+                                    addNewContact();
+                                    addNewPhoto(v1.getText().toString(), v2.getText().toString());
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -135,10 +182,64 @@ public class start_main extends AppCompatActivity {
                 // Remove all rows by the selected row number.
                 for(int rowNumber :deleteRowNumberList)
                 {
-                    stk.removeViewAt(rowNumber);
+                    stk.removeViewAt(rowNumber); return;
                 }
             }
         });
+    }
+
+    private void addNewContact() {
+        Log.v("TAG", "Adding Contact to DB");
+        Map<String, String> newContact = new HashMap<>();
+        newContact.put("Name", current_user);
+        newContact.put("id", current_uid);
+        /*
+        DocumentReference docId = db.collection("User").document(current_user);
+        String val = docId.getId();
+        Toast.makeText(start_main.this, "DocId: " + val, Toast.LENGTH_SHORT).show();
+        Log.v("TAG", "Contact : " + docId);
+        */
+        //db.collection("User").document("Contacts").set(newContact)
+        db.collection("User").document(current_user).set(newContact)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override public void onSuccess(Void aVoid) {
+                        Toast.makeText(start_main.this, "User Registered",
+                                Toast.LENGTH_SHORT).show();
+                        Log.v("TAG", "Added Contact to DB");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(start_main.this, "ERROR" + e.toString(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.v("TAG", e.toString());
+                    }
+                });
+    }
+
+    private void addNewPhoto(String photoNo, String photoText) {
+        Log.v("TAG", "Adding Photo to DB");
+        Map<String, String> newPhoto = new HashMap<>();
+        newPhoto.put("photoNo", photoNo);
+        newPhoto.put("photoText", photoText);
+        String docId = db.collection("User").document(current_user).getId();
+        String cp = "User/Photos/" + docId;
+        Log.v("TAG", "Sub Collection at: " + cp);
+        db.collection(cp).document().set(newPhoto)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override public void onSuccess(Void aVoid) {
+                        Toast.makeText(start_main.this, "Photo Added",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(start_main.this, "ERROR" + e.toString(),
+                                Toast.LENGTH_SHORT).show();
+                        Log.v("TAG", e.toString());
+                    }
+                });
     }
 
     public void init_table(){

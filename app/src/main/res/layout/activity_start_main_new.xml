@@ -32,7 +32,7 @@
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_weight="1"
-                    android:text="DB" />
+                    android:text="GET DB" />
 
                 <Button
                     android:id="@+id/table_layout_add_row_button"
@@ -54,21 +54,21 @@
                 android:layout_height="wrap_content">
 
                 <Button
-                    android:id="@+id/table_layout_add_upd_button"
+                    android:id="@+id/table_layout_order_row_button"
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_weight="1"
                     android:text="Order" />
 
                 <Button
-                    android:id="@+id/table_layout_add_row_button"
+                    android:id="@+id/table_layout_save_row_button"
                     android:layout_width="0dip"
                     android:layout_column="1"
                     android:layout_weight="1"
-                    android:text="TBD" />
+                    android:text="Save DB" />
 
                 <Button
-                    android:id="@+id/table_layout_delete_row_button"
+                    android:id="@+id/table_layout_tbd_row_button"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"

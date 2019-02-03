@@ -18,6 +18,7 @@
             android:id="@+id/table_layout_table"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#ECEFF1"
             android:padding="0dp"
             android:shrinkColumns="*"
             android:stretchColumns="*">
@@ -32,22 +33,28 @@
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_weight="1"
-                    android:text="GET DB" />
+                    android:background="@drawable/rounded_corner"
+                    android:layout_marginRight="10dp"
+                    android:text="Gallery" />
 
                 <Button
                     android:id="@+id/table_layout_add_row_button"
                     android:layout_width="0dip"
                     android:layout_column="1"
                     android:layout_weight="1"
-                    android:text="Add Row" />
+                    android:background="@drawable/rounded_corner"
+                    android:layout_marginRight="10dp"
+                    android:text="New Photo" />
 
                 <Button
                     android:id="@+id/table_layout_delete_row_button"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
-                    android:text="Del Row" />
+                    android:background="@drawable/rounded_corner"
+                    android:text="Delete" />
             </TableRow>
+            <View android:layout_height="5dp" />
             <TableRow
                 android:id="@+id/table_layout_row_3"
                 android:layout_width="match_parent"
@@ -57,23 +64,27 @@
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_weight="1"
-                    android:text="Save DB" />
+                    android:background="@drawable/rounded_corner"
+                    android:layout_marginRight="10dp"
+                    android:text="Save" />
                 <Button
                     android:id="@+id/table_layout_order_row_button"
                     android:layout_width="0dip"
                     android:layout_column="1"
                     android:layout_weight="1"
+                    android:background="@drawable/rounded_corner"
+                    android:layout_marginRight="10dp"
+
                     android:text="Order" />
                 <Button
-                    android:id="@+id/table_layout_tbd_row_button"
+                    android:id="@+id/table_layout_contact_row_button"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
-                    android:text="TBD" />
-
-
-
+                    android:background="@drawable/rounded_corner"
+                    android:text="Contact" />
             </TableRow>
+            <View android:layout_height="5dp" />
             <View
                 android:layout_height="5dp"
                 android:background="@color/colorPrimary" />

@@ -2,16 +2,22 @@ package com.example.ea;
 
 // A few code samples taken from http://www.androiddeft.com/2018/01/28/android-login-with-google-account
 
+import android.graphics.Color;
+import android.support.annotation.ColorLong;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,7 +43,14 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ProgressDialog pDialog;
     private GoogleSignInClient mGoogleSignInClient;
-
+    Spinner spinnerDropDown;
+    String ea = null;
+    String[] Establishments = {
+            "Aseem Photo Shop",
+            "Suresh Photo Shop",
+            "--------------------------",
+            "Register New Establishment"
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
         SignInButton signInButton = findViewById(R.id.sign_in_button);
         Button signOutButton = findViewById(R.id.sign_out_button);
         pDialog = new ProgressDialog(MainActivity.this);
+
+        signInButton.setSize(SignInButton.SIZE_WIDE);// wide button style
 
         // Configure Google Sign In
         // default_web_client_id is from https://console.developers.google.com/apis/credentials
@@ -70,8 +85,8 @@ public class MainActivity extends AppCompatActivity {
                 signOut();
             }
         });
-        Button continue_button = (Button)findViewById(R.id.continue_button);
-        continue_button.setOnClickListener(new View.OnClickListener() {
+        Button continue_guest = (Button)findViewById(R.id.continue_guest);
+        continue_guest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseUser user = mAuth.getCurrentUser();
@@ -79,7 +94,53 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent(MainActivity.this, start_main.class);
                 i.putExtra("user1", user.getDisplayName());
                 i.putExtra("uid1", user.getUid());
+                i.putExtra("ea", ea);
+                i.putExtra("admin", 0);
+                if (TextUtils.isEmpty(ea)) {
+                    Toast.makeText(getBaseContext(), "Please select Establishment",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                    startActivity(i);
+            }
+        });
+        Button continue_admin = (Button)findViewById(R.id.continue_admin);
+        continue_admin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseUser user = mAuth.getCurrentUser();
+                Log.v(TAG, "Name: " + user.getDisplayName() + " : " + user.getUid());
+                Intent i = new Intent(MainActivity.this, start_main.class);
+                i.putExtra("user1", user.getDisplayName());
+                i.putExtra("uid1", user.getUid());
+                i.putExtra("ea", ea);
+                i.putExtra("admin", 1);
+                if (TextUtils.isEmpty(ea)) {
+                    Toast.makeText(getBaseContext(), "Please select Establishment",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 startActivity(i);
+            }
+        });
+
+        spinnerDropDown = (Spinner) findViewById(R.id.spinner1);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.
+                R.layout.simple_spinner_item, Establishments);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDropDown.setAdapter(adapter);
+
+        spinnerDropDown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View view,
+                                                 int position, long id) {
+                // Get select item
+                int sid = spinnerDropDown.getSelectedItemPosition();
+                Toast.makeText(getBaseContext(), Establishments[sid],
+                        Toast.LENGTH_SHORT).show();
+                ea = Establishments[sid];
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
             }
         });
     }
@@ -143,12 +204,6 @@ public class MainActivity extends AppCompatActivity {
                             FirebaseUser user = mAuth.getCurrentUser();
                             Log.v(TAG, "Name: " + user.getDisplayName() + " : " + user.getUid());
                             updateUI(user);
-                            /*
-                            Intent i = new Intent(MainActivity.this, start_main.class);
-                            i.putExtra("user1", user.getDisplayName());
-                            i.putExtra("uid1", user.getUid());
-                            startActivity(i);
-                            */
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -178,17 +233,24 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "UpdateUI: Profile pic is OK");
             } else
                 Log.w(TAG, "UpdateUI: Profile pic is null");
+            //profileImage.requestLayout(cen);
             profileImage.setVisibility(View.VISIBLE);
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.continue_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.continue_guest).setVisibility(View.VISIBLE);
+            findViewById(R.id.continue_admin).setVisibility(View.VISIBLE);
+            findViewById(R.id.textView1).setVisibility(View.VISIBLE);
+            findViewById(R.id.spinner1).setVisibility(View.VISIBLE);
             Log.w(TAG, "UpdateUI: update name and pic");
         } else {
             displayName.setVisibility(View.GONE);
             profileImage.setVisibility(View.GONE);
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_button).setVisibility(View.GONE);
-            findViewById(R.id.continue_button).setVisibility(View.GONE);
+            findViewById(R.id.continue_guest).setVisibility(View.GONE);
+            findViewById(R.id.continue_admin).setVisibility(View.GONE);
+            findViewById(R.id.textView1).setVisibility(View.GONE);
+            findViewById(R.id.spinner1).setVisibility(View.GONE);
             Log.w(TAG, "UpdateUI: update name and pic - failed");
         }
     }

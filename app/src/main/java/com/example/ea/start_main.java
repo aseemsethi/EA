@@ -12,14 +12,18 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -49,7 +53,8 @@ public class start_main extends AppCompatActivity {
     FirebaseUser user;
     private Context context = null;
     FirebaseFirestore db;
-    String current_user, current_uid;
+    String current_user, current_uid, current_ea;
+    Integer current_admin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,29 +64,40 @@ public class start_main extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         final TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
-        setTitle("Photo Shop");
 
         Bundle extras = getIntent().getExtras();
         Log.v(TAG, "Get Params passed");
         if (extras == null) {
             return;
         }
+        Integer admin = extras.getInt("admin");
+        current_admin = admin;
         String value1 = extras.getString("user1");
         if (value1 != null) {
-            Log.v(TAG, "user found: " + value1);
+            Log.v(TAG, "user found: " + value1 + "; admin status: " + current_admin);
             current_user = value1;
+            // Check whether this current_user is continuing as admin, and if yes
+            // check if he is the admin of this Establishment
         }
         String uid1 = extras.getString("uid1");
-        if (value1 != null) {
+        if (uid1 != null) {
             Log.v(TAG, "UID: " + uid1);
             current_uid = uid1;
         }
+        String ea = extras.getString("ea");
+        if (ea != null) {
+            Log.v(TAG, "EA: " + ea);
+            current_ea = ea;
+            setTitle(current_ea);
+        }
 
+        // DB Get from FireCloud - Gallery
         Button getRowButton = (Button) findViewById(R.id.table_layout_get_row_button);
         getRowButton.setOnClickListener(new View.OnClickListener() {
             List<String> photos = new ArrayList<String>();
             @Override public void onClick(View v) {
                 Log.v(TAG, "Get Database entries");
+                deleteAllTableRows();
                 String cp = "User/Photos/" + current_user;
                 db.collection(cp)
                         .get()
@@ -108,6 +124,13 @@ public class start_main extends AppCompatActivity {
             }
         });
 
+        Button contactRowButton = (Button) findViewById(R.id.table_layout_contact_row_button);
+        contactRowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteAllTableRows();
+            }
+        });
 
         Button addRowButton = (Button) findViewById(R.id.table_layout_add_row_button);
         addRowButton.setOnClickListener(new View.OnClickListener() {
@@ -131,7 +154,7 @@ public class start_main extends AppCompatActivity {
                 tbrow.addView(t1v, 0);
 
                 TextView t2v = new EditText(context);
-                t2v.setText("Passport Size");
+                t2v.setText("  ");
                 t2v.setTextColor(Color.BLUE);
                 t2v.setGravity(Gravity.START);
                 lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
@@ -211,6 +234,27 @@ public class start_main extends AppCompatActivity {
                                 // If columns is a checkbox and checked then save the row number in list.
                                 CheckBox checkboxView = (CheckBox) columnView;
                                 if (checkboxView.isChecked()) {
+                                    final String cp = "User/Photos/" + current_user;
+                                    TextView firstTextView = (TextView) tableRow.getChildAt(0);
+                                    String firstText = firstTextView.getText().toString();
+                                    Log.v(TAG, "Searching for : " + firstText);
+
+                                    db.collection(cp).whereEqualTo("photoNo", firstText)
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Log.v(TAG, "Search success");
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            Log.v(TAG, document.getId() + " => " + document.getData());
+                                                            db.collection(cp).document(document.getId()).delete();
+                                                        }
+                                                    } else {
+                                                        Log.v(TAG, "Error getting documents: ", task.getException());
+                                                    }
+                                                }
+                                            });
                                     deleteRowNumberList.add(i);
                                     break;
                                 }
@@ -228,6 +272,19 @@ public class start_main extends AppCompatActivity {
         });
     }
 
+    private void deleteAllTableRows() {
+        TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
+        for (;;) {
+            int childCount = stk.getChildCount();
+            Log.v(TAG, "TableLayout size: " + childCount);
+
+            // Remove all rows except the first one
+            if (childCount > 5) {
+                stk.removeViewAt(childCount - 1);
+            } else
+                break;
+        }
+    }
     private void addRow(List<String> photos) {
         // Create a new table row.
         TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);

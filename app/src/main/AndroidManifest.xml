@@ -19,9 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".start_main">
-        </activity>
+        <activity android:name=".start_main"></activity>
+        <activity android:name=".AdminActivity"></activity>
     </application>
 
 </manifest>

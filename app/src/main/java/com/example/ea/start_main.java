@@ -96,7 +96,7 @@ public class start_main extends AppCompatActivity {
             // Check if current_user is the admin of this Establishment current_ea
             // The admin setting of True for an EA is done manually by the App Developer
             if (isAdmin == 1)
-                addAdminButtons();
+                addAdmin();
         }
         String uid1 = extras.getString("uid1");
         if (uid1 != null) {
@@ -288,58 +288,17 @@ public class start_main extends AppCompatActivity {
         });
     }
 
-    private void addAdminButtons() {
-        TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
-
-        // Create a new table row.
-        TableRow tbrow = new TableRow(start_main.this);
-        Log.v(TAG, "Adding Row");
-        tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
-                TableRow.LayoutParams.WRAP_CONTENT));
-
-        //create a button
-        Button btnAddARoom = new Button(this);
-        btnAddARoom.setText("Users");
-        TableRow.LayoutParams lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT);
-        lparams.weight = 1;
-        lparams.width = 0;
-        lparams.setMargins(5, 5, 10, 0);
-        btnAddARoom.setBackgroundResource(R.drawable.rounded_corner);
-        btnAddARoom.setLayoutParams(lparams);
-        //adds the textview
-        tbrow.addView(btnAddARoom);
-
-        //create a button
-        btnAddARoom = new Button(this);
-        btnAddARoom.setText("Orders");
-        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT);
-        lparams.weight = 1;
-        lparams.width = 0;
-        lparams.setMargins(0, 5, 10, 0);
-        btnAddARoom.setBackgroundResource(R.drawable.rounded_corner);
-        btnAddARoom.setLayoutParams(lparams);
-        //adds the textview
-        tbrow.addView(btnAddARoom);
-
-        //create a button
-        btnAddARoom = new Button(this);
-        btnAddARoom.setText("Clear");
-        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT);
-        lparams.weight = 1;
-        lparams.width = 0;
-        lparams.setMargins(0, 5, 10, 0);
-        btnAddARoom.setBackgroundResource(R.drawable.rounded_corner);
-        btnAddARoom.setLayoutParams(lparams);
-        //adds the textview
-        tbrow.addView(btnAddARoom);
-
-        stk.addView(tbrow);
-        tbrow.setBackgroundResource(R.drawable.row_border);
-
+    private void addAdmin() {
+        Intent i = new Intent(start_main.this, AdminActivity.class);
+        i.putExtra("user", current_user);
+        i.putExtra("uid", current_uid);
+        i.putExtra("ea", current_ea);
+        Log.v(TAG, "Starting Admin Activity");
+        startActivity(i);
+        // finish();
+        // finish the current activity, so a return from admin activity returns to home
     }
+
     private void deleteAllTableRows() {
         TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
         for (;;) {

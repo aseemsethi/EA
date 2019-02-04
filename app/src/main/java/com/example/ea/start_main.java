@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 import static android.view.ViewGroup.LayoutParams.FILL_PARENT;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 public class start_main extends AppCompatActivity {
     private static final String TAG = "SMMainActivity";
@@ -54,7 +55,7 @@ public class start_main extends AppCompatActivity {
     private Context context = null;
     FirebaseFirestore db;
     String current_user, current_uid, current_ea;
-    Integer current_admin;
+    Integer current_admin = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,26 +71,39 @@ public class start_main extends AppCompatActivity {
         if (extras == null) {
             return;
         }
-        Integer admin = extras.getInt("admin");
-        current_admin = admin;
+        String ea = extras.getString("ea");
+        if (ea != null) {
+            Log.v(TAG, "EA: " + ea);
+            current_ea = ea;
+            setTitle(current_ea);
+            if (ea.equals("Register New Establishment")) {
+                Toast.makeText(start_main.this,
+                        "Please contact App Administrator\n For Registering a New Establishment",
+                        Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
         String value1 = extras.getString("user1");
         if (value1 != null) {
-            Log.v(TAG, "user found: " + value1 + "; admin status: " + current_admin);
+            Log.v(TAG, "user found: " + value1);
             current_user = value1;
-            // Check whether this current_user is continuing as admin, and if yes
-            // check if he is the admin of this Establishment
+        }
+        // Check whether this current_user is continuing as admin
+        Integer isAdmin = extras.getInt("admin");
+        if (isAdmin != null) {
+            current_admin = isAdmin;
+            Log.v(TAG, "admin status: " + current_admin);
+            // Check if current_user is the admin of this Establishment current_ea
+            // The admin setting of True for an EA is done manually by the App Developer
+            if (isAdmin == 1)
+                addAdminButtons();
         }
         String uid1 = extras.getString("uid1");
         if (uid1 != null) {
             Log.v(TAG, "UID: " + uid1);
             current_uid = uid1;
         }
-        String ea = extras.getString("ea");
-        if (ea != null) {
-            Log.v(TAG, "EA: " + ea);
-            current_ea = ea;
-            setTitle(current_ea);
-        }
+
 
         // DB Get from FireCloud - Gallery
         Button getRowButton = (Button) findViewById(R.id.table_layout_get_row_button);
@@ -274,6 +288,58 @@ public class start_main extends AppCompatActivity {
         });
     }
 
+    private void addAdminButtons() {
+        TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
+
+        // Create a new table row.
+        TableRow tbrow = new TableRow(start_main.this);
+        Log.v(TAG, "Adding Row");
+        tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT));
+
+        //create a button
+        Button btnAddARoom = new Button(this);
+        btnAddARoom.setText("Users");
+        TableRow.LayoutParams lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.weight = 1;
+        lparams.width = 0;
+        lparams.setMargins(5, 5, 10, 0);
+        btnAddARoom.setBackgroundResource(R.drawable.rounded_corner);
+        btnAddARoom.setLayoutParams(lparams);
+        //adds the textview
+        tbrow.addView(btnAddARoom);
+
+        //create a button
+        btnAddARoom = new Button(this);
+        btnAddARoom.setText("Orders");
+        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.weight = 1;
+        lparams.width = 0;
+        lparams.setMargins(0, 5, 10, 0);
+        btnAddARoom.setBackgroundResource(R.drawable.rounded_corner);
+        btnAddARoom.setLayoutParams(lparams);
+        //adds the textview
+        tbrow.addView(btnAddARoom);
+
+        //create a button
+        btnAddARoom = new Button(this);
+        btnAddARoom.setText("Clear");
+        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.weight = 1;
+        lparams.width = 0;
+        lparams.setMargins(0, 5, 10, 0);
+        btnAddARoom.setBackgroundResource(R.drawable.rounded_corner);
+        btnAddARoom.setLayoutParams(lparams);
+        //adds the textview
+        tbrow.addView(btnAddARoom);
+
+        stk.addView(tbrow);
+        tbrow.setBackgroundResource(R.drawable.row_border);
+
+    }
     private void deleteAllTableRows() {
         TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
         for (;;) {

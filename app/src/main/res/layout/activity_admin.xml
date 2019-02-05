@@ -47,12 +47,12 @@
                     android:text="Orders" />
 
                 <Button
-                    android:id="@+id/table_layout_clear_row_buttonA"
+                    android:id="@+id/table_layout_photos_row_buttonA"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
-                    android:text="Clear" />
+                    android:text="Photos" />
             </TableRow>
             <View android:layout_height="5dp" />
             <TableRow

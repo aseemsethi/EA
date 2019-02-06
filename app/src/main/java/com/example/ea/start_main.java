@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -111,8 +112,9 @@ public class start_main extends AppCompatActivity {
             List<String> photos = new ArrayList<String>();
             @Override public void onClick(View v) {
                 Log.v(TAG, "Get Database entries");
+                v.startAnimation(buttonClick);
                 deleteAllTableRows();
-                String cp = current_ea + "/Photos/" + current_user;
+                String cp = current_ea + "/" + current_user + "/Photos";
                 db.collection(cp)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -138,6 +140,7 @@ public class start_main extends AppCompatActivity {
             }
         });
 
+        // Contact
         Button contactRowButton = (Button) findViewById(R.id.table_layout_contact_row_button);
         contactRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -146,11 +149,13 @@ public class start_main extends AppCompatActivity {
             }
         });
 
+        // Add a new photo
         Button addRowButton = (Button) findViewById(R.id.table_layout_add_row_button);
         addRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Create a new table row.
+                v.startAnimation(buttonClick);
                 TableRow tbrow = new TableRow(start_main.this);
                 Log.v(TAG, "Adding Row");
                 tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
@@ -199,6 +204,7 @@ public class start_main extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int rowCount = stk.getChildCount();
+                v.startAnimation(buttonClick);
                 for (int i = 0; i < rowCount; i++) {
                     View rowView = stk.getChildAt(i);
                     if (rowView instanceof TableRow) {
@@ -225,6 +231,58 @@ public class start_main extends AppCompatActivity {
             }
         });
 
+        // Orders to DB
+        Button orderRowButton = (Button) findViewById(R.id.table_layout_order_row_button);
+        orderRowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int rowCount = stk.getChildCount();
+                v.startAnimation(buttonClick);
+                for (int i = 0; i < rowCount; i++) {
+                    View rowView = stk.getChildAt(i);
+                    if (rowView instanceof TableRow) {
+                        TableRow tableRow = (TableRow) rowView;
+                        int columnCount = tableRow.getChildCount();
+                        for (int j = 0; j < columnCount; j++) {
+                            View columnView = tableRow.getChildAt(j);
+                            if (columnView instanceof CheckBox) {
+                                CheckBox checkboxView = (CheckBox) columnView;
+                                if (checkboxView.isChecked()) {
+                                    TextView v1 = (TextView) tableRow.getChildAt(0);
+                                    Log.v(TAG, "Ordering ID: " + v1.getText().toString());
+                                    TextView v2 = (TextView) tableRow.getChildAt(1);
+                                    Log.v(TAG, "Ordering Photo: " + v2.getText().toString());
+
+                                    final String cp = current_ea + "/" + current_user + "/Photos";
+                                    TextView firstTextView = (TextView) tableRow.getChildAt(0);
+                                    String firstText = firstTextView.getText().toString();
+                                    Log.v(TAG, "Searching for : " + firstText);
+                                    db.collection(cp).whereEqualTo("photoNo", firstText)
+                                            .get()
+                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Log.v(TAG, "Search Ordered Photos - success");
+                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                            Log.v(TAG, document.getId() + " => " + document.getData());
+                                                            db.collection(cp).document(document.getId()).update("order", "yes");
+                                                        }
+                                                    } else {
+                                                        Log.v(TAG, "Error getting documents: ", task.getException());
+                                                    }
+                                                }
+                                            });
+                                    stk.removeViewAt(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         // Get delete table row button.
         Button deleteRowButton = (Button) findViewById(R.id.table_layout_delete_row_button);
         deleteRowButton.setOnClickListener(new View.OnClickListener() {
@@ -232,6 +290,7 @@ public class start_main extends AppCompatActivity {
             public void onClick(View v) {
                 // Get table row count.
                 int rowCount = stk.getChildCount();
+                v.startAnimation(buttonClick);
                 Log.v(TAG, "Deleting Row, count:" + rowCount);
                 // Save delete row number list.
                 List<Integer> deleteRowNumberList = new ArrayList<Integer>();
@@ -254,7 +313,6 @@ public class start_main extends AppCompatActivity {
                                     TextView firstTextView = (TextView) tableRow.getChildAt(0);
                                     String firstText = firstTextView.getText().toString();
                                     Log.v(TAG, "Searching for : " + firstText);
-
                                     db.collection(cp).whereEqualTo("photoNo", firstText)
                                             .get()
                                             .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -287,6 +345,8 @@ public class start_main extends AppCompatActivity {
             }
         });
     }
+
+    private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
 
     private void addAdmin() {
         Intent i = new Intent(start_main.this, AdminActivity.class);
@@ -386,8 +446,10 @@ public class start_main extends AppCompatActivity {
         Map<String, String> newPhoto = new HashMap<>();
         newPhoto.put("photoNo", photoNo);
         newPhoto.put("photoText", photoText);
-        String docId = db.collection("User").document(current_user).getId();
-        String cp = current_ea + "/Photos/" + docId;
+        newPhoto.put("order", "no");
+        //String docId = db.collection("User").document(current_user).getId();
+        //String cp = current_ea + "/Photos/" + docId;
+        String cp = current_ea + "/" + current_user + "/Photos";
         Log.v(TAG, "Sub Collection at: " + cp);
         db.collection(cp).document().set(newPhoto)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

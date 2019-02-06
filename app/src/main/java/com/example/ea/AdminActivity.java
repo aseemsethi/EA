@@ -35,6 +35,7 @@ public class AdminActivity extends AppCompatActivity {
     FirebaseFirestore db;
     String current_user, current_uid, current_ea;
     private Context context = null;
+    String checkedUser = null;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,9 +110,9 @@ public class AdminActivity extends AppCompatActivity {
             @Override public void onClick(View v) {
                 v.startAnimation(buttonClick);
                 Log.v(TAG, "Get Database entries");
-                String checkedUser = getCheckedRow();
+                checkedUser = getCheckedRow();
                 deleteAllTableRows();
-                String cp = current_ea + "/Photos/" + checkedUser;
+                String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -127,6 +128,41 @@ public class AdminActivity extends AppCompatActivity {
                                             allPhotos.add(entry.getValue().toString());
                                         }
                                         addPhotosRow(allPhotos);
+                                        allPhotos.clear();
+                                    }
+                                } else {
+                                    Log.w(TAG, "Error getting documents.", task.getException());
+                                }
+                            }
+                        });
+            }
+        });
+
+        // DB Get from FireCloud - Ordered User's Photos
+        Button ordersB = (Button) findViewById(R.id.table_layout_orders_row_buttonA);
+        ordersB.setOnClickListener(new View.OnClickListener() {
+            List<String> allPhotos = new ArrayList<String>();
+            @Override public void onClick(View v) {
+                v.startAnimation(buttonClick);
+                Log.v(TAG, "Get Database entries");
+                checkedUser = getCheckedRow();
+                deleteAllTableRows();
+                String cp = current_ea + "/" + checkedUser + "/Photos";
+                db.collection(cp)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Map<String, Object> map = document.getData();
+                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                            Log.d(TAG, entry.getValue().toString());
+                                            allPhotos.add(entry.getValue().toString());
+                                        }
+                                        if (allPhotos.get(2).equals("yes"))
+                                            addPhotosRow(allPhotos);
                                         allPhotos.clear();
                                     }
                                 } else {
@@ -161,7 +197,8 @@ public class AdminActivity extends AppCompatActivity {
                 }
             }
         }
-        return null;
+        Log.v(TAG, "checkedUser is saved checked state");
+        return checkedUser;
     }
 
     private void deleteAllTableRows() {

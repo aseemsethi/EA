@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra("user1", user.getDisplayName());
                 i.putExtra("uid1", user.getUid());
                 i.putExtra("ea", ea);
-                i.putExtra("admin", 0);
+                i.putExtra("adminLogin", 0);
                 if (TextUtils.isEmpty(ea)) {
                     Toast.makeText(getBaseContext(), "Please select Establishment",
                             Toast.LENGTH_SHORT).show();
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 i.putExtra("user1", user.getDisplayName());
                 i.putExtra("uid1", user.getUid());
                 i.putExtra("ea", ea);
-                i.putExtra("admin", 1);
+                i.putExtra("adminLogin", 1);
                 if (TextUtils.isEmpty(ea)) {
                     Toast.makeText(getBaseContext(), "Please select Establishment",
                             Toast.LENGTH_SHORT).show();

@@ -56,7 +56,7 @@ public class start_main extends AppCompatActivity {
     private Context context = null;
     FirebaseFirestore db;
     String current_user, current_uid, current_ea;
-    Integer current_admin = 0;
+    String current_admin = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +90,41 @@ public class start_main extends AppCompatActivity {
             current_user = value1;
         }
         // Check whether this current_user is continuing as admin
-        Integer isAdmin = extras.getInt("admin");
-        if (isAdmin != null) {
-            current_admin = isAdmin;
+        Integer isAdmin = extras.getInt("adminLogin");
+        if (isAdmin == 1) {
+            current_admin = current_user;
             Log.v(TAG, "admin status: " + current_admin);
             // Check if current_user is the admin of this Establishment current_ea
             // The admin setting of True for an EA is done manually by the App Developer
-            if (isAdmin == 1)
-                addAdmin();
+            DocumentReference docRef = db.collection(current_ea).document(current_user);
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            if ((document.getData().get("adminFor")) == null) {
+                                Log.d(TAG, "User is not an admin");
+                                Toast toast = Toast.makeText(start_main.this, "User is not Admin",
+                                        Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                                toast.show();
+                                finish(); return;
+                            }
+                            Log.d(TAG, "Admin for: " + document.getData().get("adminFor").toString());
+                            Log.d(TAG, "User is an admin");
+                            if (document.getData().get("adminFor").equals(current_ea)) {
+                                startAdmin();
+                            }
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
         }
         String uid1 = extras.getString("uid1");
         if (uid1 != null) {
@@ -267,6 +294,8 @@ public class start_main extends AppCompatActivity {
                                                         for (QueryDocumentSnapshot document : task.getResult()) {
                                                             Log.v(TAG, document.getId() + " => " + document.getData());
                                                             db.collection(cp).document(document.getId()).update("order", "yes");
+                                                            Toast toast = Toast.makeText(start_main.this, "Photo Ordered",
+                                                                    Toast.LENGTH_LONG);
                                                         }
                                                     } else {
                                                         Log.v(TAG, "Error getting documents: ", task.getException());
@@ -348,14 +377,14 @@ public class start_main extends AppCompatActivity {
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
 
-    private void addAdmin() {
+    private void startAdmin() {
         Intent i = new Intent(start_main.this, AdminActivity.class);
         i.putExtra("user", current_user);
         i.putExtra("uid", current_uid);
         i.putExtra("ea", current_ea);
         Log.v(TAG, "Starting Admin Activity");
         startActivity(i);
-        // finish();
+        finish();
         // finish the current activity, so a return from admin activity returns to home
     }
 
@@ -425,6 +454,7 @@ public class start_main extends AppCompatActivity {
         Map<String, String> newContact = new HashMap<>();
         newContact.put("Name", current_user);
         newContact.put("id", current_uid);
+        newContact.put("adminFor", null);
         String cp = current_ea;
         db.collection(cp).document(current_user).set(newContact)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

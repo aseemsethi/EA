@@ -130,6 +130,10 @@ public class AdminActivity extends AppCompatActivity {
                                         addPhotosRow(allPhotos);
                                         allPhotos.clear();
                                     }
+                                    Toast toast = Toast.makeText(AdminActivity.this, "Photos Task completed",
+                                            Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                                    toast.show();
                                 } else {
                                     Log.w(TAG, "Error getting documents.", task.getException());
                                 }
@@ -165,6 +169,10 @@ public class AdminActivity extends AppCompatActivity {
                                             addPhotosRow(allPhotos);
                                         allPhotos.clear();
                                     }
+                                    Toast toast = Toast.makeText(AdminActivity.this, "Orders Task completed",
+                                            Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                                    toast.show();
                                 } else {
                                     Log.w(TAG, "Error getting documents.", task.getException());
                                 }

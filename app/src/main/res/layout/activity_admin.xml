@@ -35,7 +35,38 @@
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
-                    android:text="Users" />
+                    android:text="All Users" />
+
+                <Button
+                    android:id="@+id/table_layout_allPhotos_row_buttonA"
+                    android:layout_width="0dip"
+                    android:layout_column="1"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_corner_admin"
+                    android:layout_marginRight="10dp"
+                    android:text="All Photos" />
+                <Button
+                    android:id="@+id/table_layout_allOrders_row_buttonA"
+                    android:layout_width="0dip"
+                    android:layout_column="2"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_corner_admin"
+                    android:text="All Orders" />
+            </TableRow>
+
+            <TableRow
+                android:id="@+id/table_layout_admin1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/table_layout_singleUser_row_buttonA"
+                    android:layout_width="0dip"
+                    android:layout_column="0"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_corner_admin"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Per User" />
 
                 <Button
                     android:id="@+id/table_layout_orders_row_buttonA"
@@ -44,6 +75,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
                     android:text="Orders" />
 
                 <Button
@@ -51,6 +83,7 @@
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/rounded_corner_admin"
                     android:text="Photos" />
             </TableRow>
@@ -66,6 +99,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
                     android:text="Save" />
                 <Button
                     android:id="@+id/table_layout_search_row_buttonA"
@@ -74,12 +108,15 @@
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
                     android:text="Search" />
                 <Button
                     android:id="@+id/table_layout_contact_row_buttonA"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
+                    android:layout_marginTop="10dp"
+
                     android:background="@drawable/rounded_corner_admin"
                     android:text="Contact" />
             </TableRow>

@@ -103,7 +103,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
-        // DB Get from FireCloud - Clicked User's Photos
+        // DB Get from FireCloud - Checked User's Photos
         Button photosB = (Button) findViewById(R.id.table_layout_photos_row_buttonA);
         photosB.setOnClickListener(new View.OnClickListener() {
             List<String> allPhotos = new ArrayList<String>();
@@ -112,6 +112,7 @@ public class AdminActivity extends AppCompatActivity {
                 Log.v(TAG, "Get Database entries");
                 checkedUser = getCheckedRow();
                 deleteAllTableRows();
+                addCheckedUser();
                 String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
                         .get()
@@ -131,7 +132,7 @@ public class AdminActivity extends AppCompatActivity {
                                         allPhotos.clear();
                                     }
                                     Toast toast = Toast.makeText(AdminActivity.this, "Photos Task completed",
-                                            Toast.LENGTH_LONG);
+                                            Toast.LENGTH_SHORT);
                                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                                     toast.show();
                                 } else {
@@ -151,6 +152,7 @@ public class AdminActivity extends AppCompatActivity {
                 Log.v(TAG, "Get Database entries");
                 checkedUser = getCheckedRow();
                 deleteAllTableRows();
+                addCheckedUser();
                 String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
                         .get()
@@ -184,6 +186,25 @@ public class AdminActivity extends AppCompatActivity {
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
 
+    private void addCheckedUser() {
+        // Create a new table row to show user
+        TableLayout stk = (TableLayout) findViewById(R.id.table_layout_admin);
+        TableRow tbrow = new TableRow(AdminActivity.this);
+        Log.v(TAG, "Adding Checked User Row");
+        tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT));
+        TextView t1v = new EditText(context);
+        t1v.setText("For: " + checkedUser);
+        t1v.setTextColor(Color.BLUE);
+        t1v.setGravity(Gravity.START);
+        TableRow.LayoutParams lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                TableRow.LayoutParams.WRAP_CONTENT);
+        lparams.width = 400;
+        t1v.setLayoutParams(lparams);
+        tbrow.addView(t1v, 0);
+        stk.addView(tbrow);
+        tbrow.setBackgroundResource(R.drawable.row_border);
+    }
     private String getCheckedRow() {
         final TableLayout stk = (TableLayout) findViewById(R.id.table_layout_admin);
         int rowCount = stk.getChildCount();

@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,6 +37,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "EAMainActivity";
@@ -43,14 +53,14 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private ProgressDialog pDialog;
     private GoogleSignInClient mGoogleSignInClient;
+    FirebaseFirestore db;
+    // The following variables are for Establishments
     Spinner spinnerDropDown;
     String ea = null;
-    String[] Establishments = {
-            "Aseem Photo Shop",
-            "Suresh Photo Shop",
-            "--------------------------",
-            "Register New Establishment"
-    };
+    List<String> eaList = new ArrayList<String>();
+    String[] eaArray;
+    ArrayAdapter<String> spinnerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +72,18 @@ public class MainActivity extends AppCompatActivity {
 
         signInButton.setSize(SignInButton.SIZE_WIDE);// wide button style
 
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        eaList.add("Aseem Photo Shop");
+        eaList.add("Suresh Photo Shop");
+        eaList.add("Register New Establishment");
+        Log.v(TAG, "List size" + eaList.size());
+        addEstablishments();
+        Log.v(TAG, "List size" + eaList.size());
+        eaArray = new String[eaList.size()];
+        eaArray = eaList.toArray(eaArray);
+
         // Configure Google Sign In
         // default_web_client_id is from https://console.developers.google.com/apis/credentials
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -71,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        mAuth = FirebaseAuth.getInstance();
+
 
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,19 +147,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         spinnerDropDown = (Spinner) findViewById(R.id.spinner1);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.
-                R.layout.simple_spinner_item, Establishments);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDropDown.setAdapter(adapter);
+        spinnerAdapter = new ArrayAdapter<String>(this, android.
+                R.layout.simple_spinner_item, eaArray);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDropDown.setAdapter(spinnerAdapter);
 
         spinnerDropDown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override public void onItemSelected(AdapterView<?> parent, View view,
                                                  int position, long id) {
                 // Get select item
                 int sid = spinnerDropDown.getSelectedItemPosition();
-                Toast.makeText(getBaseContext(), Establishments[sid],
+                Toast.makeText(getBaseContext(), eaArray[sid],
                         Toast.LENGTH_SHORT).show();
-                ea = Establishments[sid];
+                ea = eaArray[sid];
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {
                 // TODO Auto-generated method stub
@@ -145,6 +167,29 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void addEstablishments() {
+        db.collection("Establishments").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, "Adding Establishment: " + document.getId() + " => " + document.getData());
+                                eaList.add(document.getId());
+                                eaArray = new String[eaList.size()];
+                                eaArray = eaList.toArray(eaArray);
+                                spinnerDropDown = (Spinner) findViewById(R.id.spinner1);
+                                spinnerAdapter = new ArrayAdapter<String>(MainActivity.this, android.
+                                        R.layout.simple_spinner_item, eaArray);
+                                spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                spinnerDropDown.setAdapter(spinnerAdapter);
+                            }
+                        } else {
+                            Log.w(TAG, "Error getting Establishments.", task.getException());
+                        }
+                    }
+                });
+    }
     /**
      * Display Progress bar while Logging in
      */

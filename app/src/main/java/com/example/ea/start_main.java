@@ -16,7 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -59,7 +61,8 @@ public class start_main extends AppCompatActivity {
     FirebaseFirestore db;
     String current_user, current_uid, current_ea;
     String current_admin = null;
-    TextView contactV;
+    TextView contactV, copiesV;
+    EditText numberV;
     Button contactB;
 
     @Override
@@ -176,49 +179,23 @@ public class start_main extends AppCompatActivity {
         contactRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final RelativeLayout layout = findViewById(R.id.guest_layout);
-                clearViews();
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
-                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
-                );
-                // Specify Button position in layout center
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT);
                 v.startAnimation(buttonClick);
                 deleteAllTableRows();
-
-                contactV = new TextView(context);
-                contactV.setText("Contact Info for: \n" + current_ea);
-                contactV.append("\n\nAddress: " + "Whitefield");
-                contactV.append("\nMobile: " + "9740090326");
-                contactV.setTextSize(20f);
-                contactV.setId(100);
-                contactV.setTypeface(null, Typeface.BOLD);
-                contactV.setPadding(0, 0, 0, 15);
-                contactV.setTextColor(Color.BLUE);
-                contactV.setGravity(Gravity.LEFT | Gravity.CENTER);
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                contactV.setLayoutParams(lp);
-
-                contactB = new Button(context);
-                contactB.setText("Done");
-                contactB.setBackgroundResource(R.drawable.rounded_corner_admin);
-                lp = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
-                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
-                );
-                lp.addRule(RelativeLayout.BELOW, 100);
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                contactB.setLayoutParams(lp);
-                contactB.setOnClickListener(new View.OnClickListener() {
+                v.startAnimation(buttonClick);
+                // r is the layout where your inflated layout will be added
+                final RelativeLayout r = findViewById(R.id.guest_layout_main);
+                LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                //here 1st param is the the layout you want to inflate
+                View myView = linflater.inflate(R.layout.contact, (ViewGroup) r, false);
+                r.addView(myView);
+                Button b = (Button) findViewById(R.id.ContactB);
+                b.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        layout.removeView(contactV);
-                        layout.removeView(contactB);
+                        final RelativeLayout layout = findViewById(R.id.contact_layout);
+                        r.removeView(layout);
                     }
                 });
-                layout.addView(contactV);
-                layout.addView(contactB);
             }
         });
 
@@ -310,45 +287,30 @@ public class start_main extends AppCompatActivity {
         newOrderRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final RelativeLayout layout = findViewById(R.id.guest_layout);
                 v.startAnimation(buttonClick);
-                clearViews();
-                deleteAllTableRows();
-                int rowCount = stk.getChildCount();
                 deleteAllTableRows();
                 v.startAnimation(buttonClick);
-                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
-                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
-                );
-
-                contactV = new TextView(context);
-                contactV.setText("New Order: \n");
-                contactV.setId(100);
-                contactV.setTextColor(Color.BLUE);
-                contactV.setGravity(Gravity.LEFT | Gravity.CENTER);
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                contactV.setLayoutParams(lp);
-
-                contactB = new Button(context);
-                contactB.setText("Submit");
-                contactB.setBackgroundResource(R.drawable.rounded_corner_admin);
-                lp = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
-                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
-                );
-                lp.addRule(RelativeLayout.BELOW, 100);
-                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-                contactB.setLayoutParams(lp);
-                contactB.setOnClickListener(new View.OnClickListener() {
+                // r is the layout where your inflated layout will be added
+                final RelativeLayout r = findViewById(R.id.guest_layout_main);
+                LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View myView = linflater.inflate(R.layout.templates, (ViewGroup) r, false); //here item is the the layout you want to inflate
+                r.addView(myView);
+                Button orderRowButton = (Button) findViewById(R.id.orderPhoto);
+                orderRowButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        layout.removeView(contactV);
-                        layout.removeView(contactB);
+                        final RelativeLayout layout = findViewById(R.id.guest_layout);
+                        r.removeView(layout);
                     }
                 });
-                layout.addView(contactV);
-                layout.addView(contactB);
+                Button cancelRowButton = (Button) findViewById(R.id.cancelPhoto);
+                cancelRowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final RelativeLayout layout = findViewById(R.id.guest_layout);
+                        r.removeView(layout);
+                    }
+                });
             }
         });
 
@@ -471,11 +433,6 @@ public class start_main extends AppCompatActivity {
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
 
-    private void clearViews() {
-        final RelativeLayout layout = findViewById(R.id.guest_layout);
-        layout.removeView(contactV);
-        layout.removeView(contactB);
-    }
     private void startAdmin() {
         Intent i = new Intent(start_main.this, AdminActivity.class);
         i.putExtra("user", current_user);

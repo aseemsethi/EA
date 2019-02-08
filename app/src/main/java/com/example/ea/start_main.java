@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -57,6 +59,8 @@ public class start_main extends AppCompatActivity {
     FirebaseFirestore db;
     String current_user, current_uid, current_ea;
     String current_admin = null;
+    TextView contactV;
+    Button contactB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +176,49 @@ public class start_main extends AppCompatActivity {
         contactRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                final RelativeLayout layout = findViewById(R.id.guest_layout);
+                clearViews();
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
+                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
+                );
+                // Specify Button position in layout center
+                lp.addRule(RelativeLayout.CENTER_IN_PARENT);
+                v.startAnimation(buttonClick);
                 deleteAllTableRows();
+
+                contactV = new TextView(context);
+                contactV.setText("Contact Info for: \n" + current_ea);
+                contactV.append("\n\nAddress: " + "Whitefield");
+                contactV.append("\nMobile: " + "9740090326");
+                contactV.setTextSize(20f);
+                contactV.setId(100);
+                contactV.setTypeface(null, Typeface.BOLD);
+                contactV.setPadding(0, 0, 0, 15);
+                contactV.setTextColor(Color.BLUE);
+                contactV.setGravity(Gravity.LEFT | Gravity.CENTER);
+                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                contactV.setLayoutParams(lp);
+
+                contactB = new Button(context);
+                contactB.setText("Done");
+                contactB.setBackgroundResource(R.drawable.rounded_corner_admin);
+                lp = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
+                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
+                );
+                lp.addRule(RelativeLayout.BELOW, 100);
+                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                contactB.setLayoutParams(lp);
+                contactB.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        layout.removeView(contactV);
+                        layout.removeView(contactB);
+                    }
+                });
+                layout.addView(contactV);
+                layout.addView(contactB);
             }
         });
 
@@ -183,6 +229,7 @@ public class start_main extends AppCompatActivity {
             public void onClick(View v) {
                 // Create a new table row.
                 v.startAnimation(buttonClick);
+                deleteAllTableRows();
                 TableRow tbrow = new TableRow(start_main.this);
                 Log.v(TAG, "Adding Row");
                 tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,
@@ -255,6 +302,53 @@ public class start_main extends AppCompatActivity {
                         }
                     }
                 }
+            }
+        });
+
+        // New Order
+        Button newOrderRowButton = (Button) findViewById(R.id.table_layout_newOrder_row_button);
+        newOrderRowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final RelativeLayout layout = findViewById(R.id.guest_layout);
+                v.startAnimation(buttonClick);
+                clearViews();
+                deleteAllTableRows();
+                int rowCount = stk.getChildCount();
+                deleteAllTableRows();
+                v.startAnimation(buttonClick);
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
+                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
+                );
+
+                contactV = new TextView(context);
+                contactV.setText("New Order: \n");
+                contactV.setId(100);
+                contactV.setTextColor(Color.BLUE);
+                contactV.setGravity(Gravity.LEFT | Gravity.CENTER);
+                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                contactV.setLayoutParams(lp);
+
+                contactB = new Button(context);
+                contactB.setText("Submit");
+                contactB.setBackgroundResource(R.drawable.rounded_corner_admin);
+                lp = new RelativeLayout.LayoutParams(
+                        RelativeLayout.LayoutParams.WRAP_CONTENT, // Width
+                        RelativeLayout.LayoutParams.WRAP_CONTENT // Height
+                );
+                lp.addRule(RelativeLayout.BELOW, 100);
+                lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+                contactB.setLayoutParams(lp);
+                contactB.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        layout.removeView(contactV);
+                        layout.removeView(contactB);
+                    }
+                });
+                layout.addView(contactV);
+                layout.addView(contactB);
             }
         });
 
@@ -377,6 +471,11 @@ public class start_main extends AppCompatActivity {
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
 
+    private void clearViews() {
+        final RelativeLayout layout = findViewById(R.id.guest_layout);
+        layout.removeView(contactV);
+        layout.removeView(contactB);
+    }
     private void startAdmin() {
         Intent i = new Intent(start_main.this, AdminActivity.class);
         i.putExtra("user", current_user);
@@ -405,9 +504,6 @@ public class start_main extends AppCompatActivity {
         // Create a new table row.
         TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
 
-        for (String val : photos) {
-
-        }
         TableRow tbrow = new TableRow(start_main.this);
         Log.v(TAG, "Adding Row");
         tbrow.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT,

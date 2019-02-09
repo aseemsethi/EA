@@ -1,13 +1,19 @@
 package com.example.ea;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -26,6 +32,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -45,6 +52,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +63,7 @@ import java.util.Map;
 import static android.view.ViewGroup.LayoutParams.FILL_PARENT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
+
 public class start_main extends AppCompatActivity {
     private static final String TAG = "SMMainActivity";
     FirebaseUser user;
@@ -61,9 +71,7 @@ public class start_main extends AppCompatActivity {
     FirebaseFirestore db;
     String current_user, current_uid, current_ea;
     String current_admin = null;
-    TextView contactV, copiesV;
-    EditText numberV;
-    Button contactB;
+    private static final int REQUEST_GET_SINGLE_FILE = 202;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,6 +204,32 @@ public class start_main extends AppCompatActivity {
                         r.removeView(layout);
                     }
                 });
+                final String cp = "Establishments";
+                DocumentReference docRef = db.collection(cp).document(current_ea);
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                if ((document.getData().get("Address")) != null) {
+                                    String address = (String) document.getData().get("Address");
+                                    Log.v(TAG, "Address: " + address);
+                                    TextView t = findViewById(R.id.establishmentAddress);
+                                    t.setTypeface(Typeface.DEFAULT_BOLD);
+                                    t.setText("Establishment Address: \n\n");
+                                    t.append(address);
+
+                                }
+                                } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
             }
         });
 
@@ -309,6 +343,13 @@ public class start_main extends AppCompatActivity {
                     public void onClick(View v) {
                         final RelativeLayout layout = findViewById(R.id.guest_layout);
                         r.removeView(layout);
+                    }
+                });
+                Button s = (Button) findViewById(R.id.select);
+                s.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        pickFromGallery();
                     }
                 });
             }
@@ -433,6 +474,68 @@ public class start_main extends AppCompatActivity {
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
 
+    private void pickFromGallery(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"),REQUEST_GET_SINGLE_FILE);
+    }
+
+    public String getPathFromURI(Uri contentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            res = cursor.getString(column_index);
+        }
+        cursor.close();
+        return res;
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (resultCode == RESULT_OK) {
+                if (requestCode == REQUEST_GET_SINGLE_FILE) {
+                    Uri selectedImageUri = data.getData();
+                    // Get the path from the Uri
+                    final String path = getPathFromURI(selectedImageUri);
+                    if (path != null) {
+                        File f = new File(path);
+                        selectedImageUri = Uri.fromFile(f);
+                    }
+
+                    InputStream imageStream = getContentResolver().openInputStream(selectedImageUri);
+                    Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    selectedImage = getResizedBitmap(selectedImage, 400);
+                    ImageView iv = findViewById(R.id.faceImage);
+                    iv.setImageBitmap(selectedImage);
+
+                    // Set the image in ImageView
+                    // ImageView iv = findViewById(R.id.faceImage);
+                    // iv.setImageURI(selectedImageUri);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("FileSelectorActivity", "File select error", e);
+        }
+    }
+
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float)width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
     private void startAdmin() {
         Intent i = new Intent(start_main.this, AdminActivity.class);
         i.putExtra("user", current_user);

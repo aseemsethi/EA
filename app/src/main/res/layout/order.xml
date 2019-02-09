@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/order_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="200dp">
+
+    <TextView
+        android:id="@+id/select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirm Order details below"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_corner"/>
+
+    <TextView
+        android:id="@+id/confirm_order"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Copies"
+        android:textSize="20sp"
+        android:layout_marginTop="100dp" />
+
+    <EditText
+        android:id="@+id/copies"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="100dp"
+        android:text="1"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/three"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Size"
+        android:textSize="20sp"
+        android:layout_marginTop="150dp" />
+
+    <EditText
+        android:id="@+id/size"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:gravity="center_vertical"
+        android:text="Passport"
+        android:textSize="20sp"
+        android:layout_marginTop="150dp" />
+
+    <TextView
+        android:id="@+id/photoID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="PhotoID: "
+        android:textSize="20sp"
+        android:layout_marginTop="200dp" />
+
+    <TextView
+        android:id="@+id/photoName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Photo Name: "
+        android:textSize="20sp"
+        android:layout_marginTop="250dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/orderPhotoG"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="30dp"
+            android:text="Order" />
+
+        <Button
+            android:id="@+id/cancelPhotoG"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/rounded_corner"
+            android:text="Cancel" />
+    </LinearLayout>
+
+</RelativeLayout>

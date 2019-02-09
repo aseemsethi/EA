@@ -323,7 +323,6 @@ public class start_main extends AppCompatActivity {
             public void onClick(View v) {
                 v.startAnimation(buttonClick);
                 deleteAllTableRows();
-                v.startAnimation(buttonClick);
                 // r is the layout where your inflated layout will be added
                 final RelativeLayout r = findViewById(R.id.guest_layout_main);
                 LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -358,10 +357,11 @@ public class start_main extends AppCompatActivity {
         // Orders to DB
         Button orderRowButton = (Button) findViewById(R.id.table_layout_order_row_button);
         orderRowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int rowCount = stk.getChildCount();
+            String photoNum = null, photoName = null;
+
+            @Override public void onClick(View v) {
                 v.startAnimation(buttonClick);
+                int rowCount = stk.getChildCount();
                 for (int i = 0; i < rowCount; i++) {
                     View rowView = stk.getChildAt(i);
                     if (rowView instanceof TableRow) {
@@ -376,36 +376,63 @@ public class start_main extends AppCompatActivity {
                                     Log.v(TAG, "Ordering ID: " + v1.getText().toString());
                                     TextView v2 = (TextView) tableRow.getChildAt(1);
                                     Log.v(TAG, "Ordering Photo: " + v2.getText().toString());
-
-                                    final String cp = current_ea + "/" + current_user + "/Photos";
-                                    TextView firstTextView = (TextView) tableRow.getChildAt(0);
-                                    String firstText = firstTextView.getText().toString();
-                                    Log.v(TAG, "Searching for : " + firstText);
-                                    db.collection(cp).whereEqualTo("photoNo", firstText)
-                                            .get()
-                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                    if (task.isSuccessful()) {
-                                                        Log.v(TAG, "Search Ordered Photos - success");
-                                                        for (QueryDocumentSnapshot document : task.getResult()) {
-                                                            Log.v(TAG, document.getId() + " => " + document.getData());
-                                                            db.collection(cp).document(document.getId()).update("order", "yes");
-                                                            Toast toast = Toast.makeText(start_main.this, "Photo Ordered",
-                                                                    Toast.LENGTH_LONG);
-                                                        }
-                                                    } else {
-                                                        Log.v(TAG, "Error getting documents: ", task.getException());
-                                                    }
-                                                }
-                                            });
-                                    stk.removeViewAt(i);
+                                    photoNum = v1.getText().toString();
+                                    photoName = v2.getText().toString();
                                     break;
                                 }
                             }
                         }
                     }
                 }
+
+                deleteAllTableRows();
+                // Bring up the Order View
+                if ((photoName == null) || (photoNum == null)) return;
+                final RelativeLayout r = findViewById(R.id.guest_layout_main);
+                LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View myView = linflater.inflate(R.layout.order, (ViewGroup) r, false); //here item is the the layout you want to inflate
+                r.addView(myView);
+                TextView t1 = findViewById(R.id.photoID);
+                t1.setText("PhotoID: " + photoNum);
+                TextView t2 = findViewById(R.id.photoName);
+                t2.setText("Photo Name: " + photoName);
+
+                Button orderRowButton = (Button) findViewById(R.id.orderPhotoG);
+                orderRowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final RelativeLayout layout = findViewById(R.id.order_layout);
+                        final String cp = current_ea + "/" + current_user + "/Photos";
+                        Log.v(TAG, "Searching for : " + photoNum);
+                        db.collection(cp).whereEqualTo("photoNo", photoNum)
+                                .get()
+                                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.v(TAG, "Search Ordered Photos - success");
+                                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                                Log.v(TAG, document.getId() + " => " + document.getData());
+                                                db.collection(cp).document(document.getId()).update("order", "yes");
+                                                Toast toast = Toast.makeText(start_main.this, "Photo Ordered",
+                                                        Toast.LENGTH_LONG);
+                                            }
+                                        } else {
+                                            Log.v(TAG, "Error getting documents: ", task.getException());
+                                        }
+                                    }
+                                });
+                        r.removeView(layout);
+                    }
+                });
+                Button cancelRowButton = (Button) findViewById(R.id.cancelPhotoG);
+                cancelRowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final RelativeLayout layout = findViewById(R.id.order_layout);
+                        r.removeView(layout);
+                    }
+                });
             }
         });
 

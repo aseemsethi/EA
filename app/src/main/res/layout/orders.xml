@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/orders_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginTop="250dp">
+
+    <TextView
+        android:id="@+id/ordersFor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Order details: "
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/rounded_corner"/>
+
+    <TextView
+        android:id="@+id/copiesText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Copies"
+        android:textSize="20sp"
+        android:layout_marginTop="75dp" />
+
+    <TextView
+        android:id="@+id/copiesOrders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:gravity="center_vertical"
+        android:layout_marginTop="75dp"
+        android:text="1"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/sizeOrdersText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Size"
+        android:textSize="20sp"
+        android:layout_marginTop="125dp" />
+
+    <TextView
+        android:id="@+id/sizeOrders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:gravity="center_vertical"
+        android:text="Passport"
+        android:textSize="20sp"
+        android:layout_marginTop="125dp" />
+
+    <TextView
+        android:id="@+id/photoIDOrders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="PhotoID: "
+        android:textSize="20sp"
+        android:layout_marginTop="175dp" />
+
+    <TextView
+        android:id="@+id/photoNameOrders"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Photo Name: "
+        android:textSize="20sp"
+        android:layout_marginTop="225dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/orderPhotoO"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/rounded_corner"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="20dp"
+            android:text="Completed" />
+
+        <Button
+            android:id="@+id/cancelPhotoO"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/rounded_corner"
+            android:text="Cancelled" />
+    </LinearLayout>
+
+</RelativeLayout>

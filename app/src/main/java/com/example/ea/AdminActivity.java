@@ -10,11 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -152,7 +155,15 @@ public class AdminActivity extends AppCompatActivity {
                 Log.v(TAG, "Get Database entries");
                 checkedUser = getCheckedRow();
                 deleteAllTableRows();
-                addCheckedUser();
+                addCheckedUser();  // This is header Row with User Name
+
+                final RelativeLayout r = findViewById(R.id.admin_layout_main);
+                LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View myView = linflater.inflate(R.layout.orders, (ViewGroup) r, false); //here item is the the layout you want to inflate
+                r.addView(myView);
+                final TextView pi = findViewById(R.id.photoIDOrders);
+                final TextView pn = findViewById(R.id.photoNameOrders);
+
                 String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
                         .get()
@@ -167,9 +178,12 @@ public class AdminActivity extends AppCompatActivity {
                                             Log.d(TAG, entry.getValue().toString());
                                             allPhotos.add(entry.getValue().toString());
                                         }
-                                        if (allPhotos.get(2).equals("yes"))
-                                            addPhotosRow(allPhotos);
+                                        if (allPhotos.get(2).equals("yes")) {
+                                            pi.setText("PhotoID: " + allPhotos.get(0));
+                                            pn.setText("Photo Name: " + allPhotos.get(1));
+                                        }
                                         allPhotos.clear();
+                                        break; // TBD: For now only 1 order can be given
                                     }
                                     Toast toast = Toast.makeText(AdminActivity.this, "Orders Task completed",
                                             Toast.LENGTH_LONG);
@@ -180,6 +194,26 @@ public class AdminActivity extends AppCompatActivity {
                                 }
                             }
                         });
+
+                Button orderRowButton = (Button) findViewById(R.id.orderPhotoO);
+                orderRowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final RelativeLayout layout = findViewById(R.id.orders_layout);
+                        deleteAllTableRows();
+                        r.removeView(layout);
+                        // TBD: Remove the "yes" from the photos DB and make it "no"
+                    }
+                });
+                Button cancelRowButton = (Button) findViewById(R.id.cancelPhotoO);
+                cancelRowButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final RelativeLayout layout = findViewById(R.id.orders_layout);
+                        deleteAllTableRows();
+                        r.removeView(layout);
+                    }
+                });
             }
         });
     }

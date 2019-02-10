@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EA</string>
+    <string name="app_name">MyPhotoShop</string>
     <string name="title_activity_start_main">start_main</string>
     <string name="default_web_client_id1">997067166275-i8icocf4oicng3c8jkmhbhu4ctk02kc6.apps.googleusercontent.com</string>
     <string name="title_activity_admin">AdminActivity</string>

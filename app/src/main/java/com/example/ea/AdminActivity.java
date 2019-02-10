@@ -77,6 +77,7 @@ public class AdminActivity extends AppCompatActivity {
                 v.startAnimation(buttonClick);
                 Log.v(TAG, "Get Database entries");
                 deleteAllTableRows();
+                clearOrdersScreen();
                 // String cp = current_ea + "/Photos/" + current_user;
                 String cp = current_ea;
                 db.collection(cp)
@@ -115,6 +116,7 @@ public class AdminActivity extends AppCompatActivity {
                 Log.v(TAG, "Get Database entries");
                 checkedUser = getCheckedRow();
                 deleteAllTableRows();
+                clearOrdersScreen();
                 addCheckedUser();
                 String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
@@ -147,6 +149,7 @@ public class AdminActivity extends AppCompatActivity {
         Button ordersB = (Button) findViewById(R.id.table_layout_orders_row_buttonA);
         ordersB.setOnClickListener(new View.OnClickListener() {
             List<String> allPhotos = new ArrayList<String>();
+            String docID = null;
             @Override public void onClick(View v) {
                 v.startAnimation(buttonClick);
                 Log.v(TAG, "Get Database entries");
@@ -163,7 +166,7 @@ public class AdminActivity extends AppCompatActivity {
                 final TextView co = findViewById(R.id.copiesOrders);
                 final TextView so = findViewById(R.id.sizeOrders);
 
-                String cp = current_ea + "/" + checkedUser + "/Photos";
+                final String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -173,12 +176,14 @@ public class AdminActivity extends AppCompatActivity {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
                                         if (document.getData().get("order").toString().equals("yes")) {
+                                            Log.v(TAG, "Found order: " + document.getData().get("photoText").toString());
+                                            docID = document.getId();
                                             pi.setText("PhotoID:       " + document.getData().get("photoNo").toString());
                                             pn.setText("Photo Name:      " + document.getData().get("photoText").toString());
                                             co.setText(document.getData().get("copies").toString());
                                             so.setText(document.getData().get("size").toString());
+                                            break; // TBD: For now only 1 order can be given
                                         }
-                                        break; // TBD: For now only 1 order can be given
                                     }
                                     Toast toast = Toast.makeText(AdminActivity.this, "Orders Task completed",
                                             Toast.LENGTH_LONG);
@@ -194,23 +199,30 @@ public class AdminActivity extends AppCompatActivity {
                 orderRowButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final RelativeLayout layout = findViewById(R.id.orders_layout);
-                        deleteAllTableRows();
-                        r.removeView(layout);
-                        // TBD: Remove the "yes" from the photos DB and make it "no"
+                        if (docID != null)
+                            db.collection(cp).document(docID).update("order", "no");
+                        clearOrdersScreen();
                     }
                 });
                 Button cancelRowButton = (Button) findViewById(R.id.cancelPhotoO);
                 cancelRowButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        final RelativeLayout layout = findViewById(R.id.orders_layout);
-                        deleteAllTableRows();
-                        r.removeView(layout);
+                        clearOrdersScreen();
+                        //final RelativeLayout layout = findViewById(R.id.orders_layout);
+                        //deleteAllTableRows();
+                        //r.removeView(layout);
                     }
                 });
             }
         });
+    }
+
+    private void clearOrdersScreen() {
+        final RelativeLayout r = findViewById(R.id.admin_layout_main);
+        final RelativeLayout layout = findViewById(R.id.orders_layout);
+        deleteAllTableRows();
+        r.removeView(layout);
     }
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);

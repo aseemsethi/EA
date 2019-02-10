@@ -38,7 +38,7 @@
         android:layout_marginTop="350dp" />
 
     <EditText
-        android:id="@+id/three"
+        android:id="@+id/copiesE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -58,7 +58,7 @@
         android:layout_marginTop="400dp" />
 
     <EditText
-        android:id="@+id/three"
+        android:id="@+id/sizeE"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
@@ -67,6 +67,26 @@
         android:text="Passport"
         android:textSize="20sp"
         android:layout_marginTop="400dp" />
+
+    <TextView
+        android:id="@+id/PhotoName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Photo Name"
+        android:textSize="20sp"
+        android:layout_marginTop="450dp" />
+
+    <EditText
+        android:id="@+id/PhotoNameE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:gravity="center_vertical"
+        android:text="Personal"
+        android:textSize="20sp"
+        android:layout_marginTop="450dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

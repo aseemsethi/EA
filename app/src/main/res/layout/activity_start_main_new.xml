@@ -29,44 +29,66 @@
                 android:id="@+id/table_layout_row_3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-
                 <Button
-                    android:id="@+id/table_layout_get_row_button"
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_corner"
+                    android:layout_weight="1.5"
                     android:text="Gallery" />
-
                 <Button
-                    android:id="@+id/table_layout_add_row_button"
+                    android:id="@+id/table_layout_get_row_button"
                     android:layout_width="0dip"
                     android:layout_column="1"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner"
-                    android:text="Add" />
+                    android:text="Show" />
 
                 <Button
-                    android:id="@+id/table_layout_save_row_button"
+                    android:id="@+id/table_layout_add_row_button"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner"
-                    android:text="Save" />
-
+                    android:text="Add" />
                 <Button
                     android:id="@+id/table_layout_delete_row_button"
                     android:layout_width="0dip"
-                    android:layout_column="2"
+                    android:layout_column="3"
+                    android:layout_weight="1"
+                    android:layout_marginRight="5dp"
+                    android:background="@drawable/rounded_corner"
+                    android:text="Del" />
+            </TableRow>
+            <View android:layout_height="5dp" />
+            <TableRow
+                android:id="@+id/table_layout_row_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/table_layout_save_row_button"
+                    android:layout_width="0dip"
+                    android:layout_column="1"
+                    android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner"
-                    android:text="Delete" />
+                    android:text="Save" />
+                <Button
+                    android:id="@+id/table_layout_order_row_button"
+                    android:layout_width="0dip"
+                    android:layout_column="2"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_corner"
+                    android:text="Order" />
+
             </TableRow>
 
-            <View android:layout_height="5dp" />
+            <View android:layout_height="2dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/colorPrimary" />
 
             <TableRow
                 android:id="@+id/table_layout_row_4"
@@ -74,13 +96,11 @@
                 android:layout_height="wrap_content">
 
                 <Button
-                    android:id="@+id/table_layout_order_row_button"
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/rounded_corner"
-                    android:text="Order" />
+                    android:text="Orders" />
 
                 <Button
                     android:id="@+id/table_layout_newOrder_row_button"
@@ -89,20 +109,18 @@
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner"
-
-                    android:text="New Order" />
+                    android:text="New" />
 
                 <Button
-                    android:id="@+id/table_layout_contact_row_button"
+                    android:id="@+id/table_layout_allOrder_row_button"
                     android:layout_width="0dip"
                     android:layout_column="2"
+                    android:layout_marginRight="5dp"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner"
-                    android:text="Contact" />
+                    android:text="All" />
             </TableRow>
-
             <View android:layout_height="5dp" />
-
             <View
                 android:layout_height="5dp"
                 android:background="@color/colorPrimary" />

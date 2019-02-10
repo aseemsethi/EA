@@ -72,6 +72,7 @@ public class start_main extends AppCompatActivity {
     String current_user, current_uid, current_ea;
     String current_admin = null;
     private static final int REQUEST_GET_SINGLE_FILE = 202;
+    Integer found = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,7 @@ public class start_main extends AppCompatActivity {
             Log.v(TAG, "user found: " + value1);
             current_user = value1;
         }
+        addNewContact();
         // Check whether this current_user is continuing as admin
         Integer isAdmin = extras.getInt("adminLogin");
         if (isAdmin == 1) {
@@ -178,57 +180,6 @@ public class start_main extends AppCompatActivity {
             }
         });
 
-        // Contact
-        Button contactRowButton = (Button) findViewById(R.id.table_layout_contact_row_button);
-        contactRowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                v.startAnimation(buttonClick);
-                deleteAllTableRows();
-                v.startAnimation(buttonClick);
-                // r is the layout where your inflated layout will be added
-                final RelativeLayout r = findViewById(R.id.guest_layout_main);
-                LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                //here 1st param is the the layout you want to inflate
-                View myView = linflater.inflate(R.layout.contact, (ViewGroup) r, false);
-                r.addView(myView);
-                Button b = (Button) findViewById(R.id.ContactB);
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final RelativeLayout layout = findViewById(R.id.contact_layout);
-                        r.removeView(layout);
-                    }
-                });
-                final String cp = "Establishments";
-                DocumentReference docRef = db.collection(cp).document(current_ea);
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                                if ((document.getData().get("Address")) != null) {
-                                    String address = (String) document.getData().get("Address");
-                                    Log.v(TAG, "Address: " + address);
-                                    TextView t = findViewById(R.id.establishmentAddress);
-                                    t.setTypeface(Typeface.DEFAULT_BOLD);
-                                    t.setText("Establishment Address: \n\n");
-                                    t.append(address);
-
-                                }
-                                } else {
-                                Log.d(TAG, "No such document");
-                            }
-                        } else {
-                            Log.d(TAG, "get failed with ", task.getException());
-                        }
-                    }
-                });
-            }
-        });
-
         // Add a new photo
         Button addRowButton = (Button) findViewById(R.id.table_layout_add_row_button);
         addRowButton.setOnClickListener(new View.OnClickListener() {
@@ -300,8 +251,8 @@ public class start_main extends AppCompatActivity {
                                     Log.v(TAG, "ID: " + v1.getText().toString());
                                     TextView v2 = (TextView) tableRow.getChildAt(1);
                                     Log.v(TAG, "Photo: " + v2.getText().toString());
-                                    addNewContact();
-                                    addNewPhoto(v1.getText().toString(), v2.getText().toString());
+                                    //addNewContact();
+                                    addNewPhoto(v1.getText().toString(), v2.getText().toString(), "no", "1", "Passport");
                                     stk.removeViewAt(i);
                                     break;
                                 }
@@ -329,6 +280,11 @@ public class start_main extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         final RelativeLayout layout = findViewById(R.id.guest_layout);
+                        EditText e1 = findViewById(R.id.PhotoNameE);
+                        EditText c1 = findViewById(R.id.copiesE);
+                        EditText s1 = findViewById(R.id.sizeE);
+                        addNewPhoto("000", e1.getText().toString(), "yes",
+                                c1.getText().toString(), s1.getText().toString());
                         r.removeView(layout);
                     }
                 });
@@ -634,32 +590,52 @@ public class start_main extends AppCompatActivity {
 
     private void addNewContact() {
         Log.v(TAG, "Adding Contact to DB");
-        Map<String, String> newContact = new HashMap<>();
-        newContact.put("Name", current_user);
-        newContact.put("id", current_uid);
-        newContact.put("adminFor", null);
-        String cp = current_ea;
-        db.collection(cp).document(current_user).set(newContact)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override public void onSuccess(Void aVoid) {
-                        Log.v(TAG, "Added Contact to DB");
+        DocumentReference docRef = db.collection(current_ea).document(current_user);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        if (document.getData().get("Name").equals(current_user)) {
+                            Log.v(TAG, "User already exsists: " + current_user);
+                        } else {
+                            Map<String, String> newContact = new HashMap<>();
+                            newContact.put("Name", current_user);
+                            newContact.put("id", current_uid);
+                            newContact.put("adminFor", null);
+                            db.collection(current_ea).document(current_user).set(newContact)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override public void onSuccess(Void aVoid) {
+                                            Log.v(TAG, "Added New Contact to DB: " + current_user);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(start_main.this, "ERROR" + e.toString(),
+                                                    Toast.LENGTH_SHORT).show();
+                                            Log.v(TAG, e.toString());
+                                        }
+                                    });
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(start_main.this, "ERROR" + e.toString(),
-                                Toast.LENGTH_SHORT).show();
-                        Log.v(TAG, e.toString());
-                    }
-                });
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
-    private void addNewPhoto(String photoNo, String photoText) {
+    private void addNewPhoto(String photoNo, String photoText, String order, String copies, String size) {
         Log.v(TAG, "Adding Photo to DB");
         Map<String, String> newPhoto = new HashMap<>();
         newPhoto.put("photoNo", photoNo);
         newPhoto.put("photoText", photoText);
-        newPhoto.put("order", "no");
+        newPhoto.put("order", order);
+        newPhoto.put("copies", copies);
+        newPhoto.put("size", size);
         //String docId = db.collection("User").document(current_user).getId();
         //String cp = current_ea + "/Photos/" + docId;
         String cp = current_ea + "/" + current_user + "/Photos";

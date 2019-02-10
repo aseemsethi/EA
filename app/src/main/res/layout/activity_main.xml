@@ -89,4 +89,11 @@
         </Button>
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/contactT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:visibility="visible" />
 </LinearLayout>

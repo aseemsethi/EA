@@ -3,6 +3,7 @@ package com.example.ea;
 // A few code samples taken from http://www.androiddeft.com/2018/01/28/android-login-with-google-account
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.ColorLong;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -160,6 +161,31 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getBaseContext(), eaArray[sid],
                         Toast.LENGTH_SHORT).show();
                 ea = eaArray[sid];
+                final String cp = "Establishments";
+                DocumentReference docRef = db.collection(cp).document(ea);
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                if ((document.getData().get("Address")) != null) {
+                                    String address = (String) document.getData().get("Address");
+                                    Log.v(TAG, "Address: " + address);
+                                    TextView t = findViewById(R.id.contactT);
+                                    t.setTypeface(Typeface.DEFAULT_BOLD);
+                                    t.setText("Establishment Address: \n\n");
+                                    t.append(address);
+                                }
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {
                 // TODO Auto-generated method stub

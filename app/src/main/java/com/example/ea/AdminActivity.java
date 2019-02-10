@@ -126,11 +126,8 @@ public class AdminActivity extends AppCompatActivity {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
                                         Map<String, Object> map = document.getData();
-                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                            //Log.d(TAG, entry.getKey().toString());
-                                            Log.d(TAG, entry.getValue().toString());
-                                            allPhotos.add(entry.getValue().toString());
-                                        }
+                                        allPhotos.add(document.getData().get("photoNo").toString());
+                                        allPhotos.add(document.getData().get("photoText").toString());
                                         addPhotosRow(allPhotos);
                                         allPhotos.clear();
                                     }
@@ -163,6 +160,8 @@ public class AdminActivity extends AppCompatActivity {
                 r.addView(myView);
                 final TextView pi = findViewById(R.id.photoIDOrders);
                 final TextView pn = findViewById(R.id.photoNameOrders);
+                final TextView co = findViewById(R.id.copiesOrders);
+                final TextView so = findViewById(R.id.sizeOrders);
 
                 String cp = current_ea + "/" + checkedUser + "/Photos";
                 db.collection(cp)
@@ -173,16 +172,12 @@ public class AdminActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
-                                        Map<String, Object> map = document.getData();
-                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                            Log.d(TAG, entry.getValue().toString());
-                                            allPhotos.add(entry.getValue().toString());
+                                        if (document.getData().get("order").toString().equals("yes")) {
+                                            pi.setText("PhotoID:       " + document.getData().get("photoNo").toString());
+                                            pn.setText("Photo Name:      " + document.getData().get("photoText").toString());
+                                            co.setText(document.getData().get("copies").toString());
+                                            so.setText(document.getData().get("size").toString());
                                         }
-                                        if (allPhotos.get(2).equals("yes")) {
-                                            pi.setText("PhotoID: " + allPhotos.get(0));
-                                            pn.setText("Photo Name: " + allPhotos.get(1));
-                                        }
-                                        allPhotos.clear();
                                         break; // TBD: For now only 1 order can be given
                                     }
                                     Toast toast = Toast.makeText(AdminActivity.this, "Orders Task completed",

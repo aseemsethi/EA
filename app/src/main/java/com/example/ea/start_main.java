@@ -165,12 +165,8 @@ public class start_main extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
-                                        Map<String, Object> map = document.getData();
-                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
-                                            //Log.d(TAG, entry.getKey().toString());
-                                            Log.d(TAG, entry.getValue().toString());
-                                            photos.add(entry.getValue().toString());
-                                        }
+                                        photos.add(document.getData().get("photoNo").toString());
+                                        photos.add(document.getData().get("photoText").toString());
                                         addRow(photos);
                                         photos.clear();
                                     }
@@ -283,7 +279,7 @@ public class start_main extends AppCompatActivity {
             }
         });
 
-        // Save to DB
+        // Save New Photo to DB
         Button saveRowButton = (Button) findViewById(R.id.table_layout_save_row_button);
         saveRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,7 +312,7 @@ public class start_main extends AppCompatActivity {
             }
         });
 
-        // New Order
+        // Non Gallery New Order
         Button newOrderRowButton = (Button) findViewById(R.id.table_layout_newOrder_row_button);
         newOrderRowButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,7 +350,7 @@ public class start_main extends AppCompatActivity {
             }
         });
 
-        // Orders to DB
+        // Gallery to Orders to DB
         Button orderRowButton = (Button) findViewById(R.id.table_layout_order_row_button);
         orderRowButton.setOnClickListener(new View.OnClickListener() {
             String photoNum = null, photoName = null;
@@ -396,6 +392,8 @@ public class start_main extends AppCompatActivity {
                 t1.setText("PhotoID: " + photoNum);
                 TextView t2 = findViewById(R.id.photoName);
                 t2.setText("Photo Name: " + photoName);
+                final EditText e1 = findViewById(R.id.copies);
+                final EditText e2 = findViewById(R.id.size);
 
                 Button orderRowButton = (Button) findViewById(R.id.orderPhotoG);
                 orderRowButton.setOnClickListener(new View.OnClickListener() {
@@ -414,6 +412,8 @@ public class start_main extends AppCompatActivity {
                                             for (QueryDocumentSnapshot document : task.getResult()) {
                                                 Log.v(TAG, document.getId() + " => " + document.getData());
                                                 db.collection(cp).document(document.getId()).update("order", "yes");
+                                                db.collection(cp).document(document.getId()).update("copies", e1.getText().toString());
+                                                db.collection(cp).document(document.getId()).update("size", e2.getText().toString());
                                                 Toast toast = Toast.makeText(start_main.this, "Photo Ordered",
                                                         Toast.LENGTH_LONG);
                                             }

@@ -64,7 +64,6 @@
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_weight="1"
-                    android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="10dp"
                     android:text="Per User" />
@@ -89,38 +88,7 @@
                     android:text="Photos" />
             </TableRow>
             <View android:layout_height="5dp" />
-            <TableRow
-                android:id="@+id/table_layout_row_3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <Button
-                    android:id="@+id/table_layout_save_row_buttonA"
-                    android:layout_width="0dip"
-                    android:layout_column="0"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_corner_admin"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
-                    android:text="Save" />
-                <Button
-                    android:id="@+id/table_layout_search_row_buttonA"
-                    android:layout_width="0dip"
-                    android:layout_column="1"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_corner_admin"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
-                    android:text="Search" />
-                <Button
-                    android:id="@+id/table_layout_contact_row_buttonA"
-                    android:layout_width="0dip"
-                    android:layout_column="2"
-                    android:layout_weight="1"
-                    android:layout_marginTop="10dp"
 
-                    android:background="@drawable/rounded_corner_admin"
-                    android:text="Contact" />
-            </TableRow>
             <View android:layout_height="5dp" />
             <View
                 android:layout_height="5dp"

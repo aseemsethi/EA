@@ -169,7 +169,7 @@ public class start_main extends AppCompatActivity {
                                         Log.d(TAG, document.getId() + " => " + document.getData());
                                         photos.add(document.getData().get("photoNo").toString());
                                         photos.add(document.getData().get("photoText").toString());
-                                        addRow(photos);
+                                        addRow(photos, 1);
                                         photos.clear();
                                     }
                                 } else {
@@ -445,6 +445,39 @@ public class start_main extends AppCompatActivity {
                 }
             }
         });
+
+
+        // DB Get All Orders from FireCloud
+        Button getAllButton = (Button) findViewById(R.id.table_layout_allOrder_row_button);
+        getAllButton.setOnClickListener(new View.OnClickListener() {
+            List<String> photos = new ArrayList<String>();
+            @Override public void onClick(View v) {
+                Log.v(TAG, "Get Database entries");
+                v.startAnimation(buttonClick);
+                deleteAllTableRows();
+                final String cp = current_ea + "/" + current_user + "/Photos";
+                db.collection(cp)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (DocumentSnapshot document : task.getResult()) {
+                                        if (document.getData().get("order").toString().equals("yes")) {
+                                            Log.d(TAG, document.getId() + " => " + document.getData());
+                                            photos.add(document.getData().get("photoNo").toString());
+                                            photos.add(document.getData().get("photoText").toString());
+                                            addRow(photos, 0);
+                                            photos.clear();
+                                        }
+                                    }
+                                } else {
+                                    Log.w(TAG, "Error getting documents.", task.getException());
+                                }
+                            }
+                        });
+            }
+        });
     }
 
     private AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.1F);
@@ -535,7 +568,7 @@ public class start_main extends AppCompatActivity {
                 break;
         }
     }
-    private void addRow(List<String> photos) {
+    private void addRow(List<String> photos, Integer checkbox) {
         // Create a new table row.
         TableLayout stk = (TableLayout) findViewById(R.id.table_layout_table);
 
@@ -566,15 +599,17 @@ public class start_main extends AppCompatActivity {
         t2v.setLayoutParams(lparams);
         tbrow.addView(t2v, 1);
 
-        // Add a checkbox in the third column.
-        CheckBox checkBox = new CheckBox(context);
-        checkBox.setGravity(Gravity.RIGHT);
-        lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
-                TableRow.LayoutParams.WRAP_CONTENT);
-        lparams.weight = 0.5f;
-        lparams.width = 0;
-        checkBox.setLayoutParams(lparams);
-        tbrow.addView(checkBox, 2);
+        if (checkbox == 1) {
+            // Add a checkbox in the third column.
+            CheckBox checkBox = new CheckBox(context);
+            checkBox.setGravity(Gravity.RIGHT);
+            lparams = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
+                    TableRow.LayoutParams.WRAP_CONTENT);
+            lparams.weight = 0.5f;
+            lparams.width = 0;
+            checkBox.setLayoutParams(lparams);
+            tbrow.addView(checkBox, 2);
+        }
 
         stk.addView(tbrow);
         tbrow.setBackgroundResource(R.drawable.row_border);

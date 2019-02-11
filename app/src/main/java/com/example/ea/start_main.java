@@ -183,8 +183,7 @@ public class start_main extends AppCompatActivity {
         // Add a new photo
         Button addRowButton = (Button) findViewById(R.id.table_layout_add_row_button);
         addRowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            @Override public void onClick(View v) {
                 // Create a new table row.
                 v.startAnimation(buttonClick);
                 deleteAllTableRows();
@@ -227,39 +226,32 @@ public class start_main extends AppCompatActivity {
 
                 stk.addView(tbrow);
                 tbrow.setBackgroundResource(R.drawable.row_border);
-            }
-        });
-
-        // Save New Photo to DB
-        Button saveRowButton = (Button) findViewById(R.id.table_layout_save_row_button);
-        saveRowButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int rowCount = stk.getChildCount();
-                v.startAnimation(buttonClick);
-                for (int i = 0; i < rowCount; i++) {
-                    View rowView = stk.getChildAt(i);
-                    if (rowView instanceof TableRow) {
-                        TableRow tableRow = (TableRow) rowView;
-                        int columnCount = tableRow.getChildCount();
-                        for (int j = 0; j < columnCount; j++) {
-                            View columnView = tableRow.getChildAt(j);
-                            if (columnView instanceof CheckBox) {
-                                CheckBox checkboxView = (CheckBox) columnView;
-                                if (checkboxView.isChecked()) {
-                                    TextView v1 = (TextView) tableRow.getChildAt(0);
-                                    Log.v(TAG, "ID: " + v1.getText().toString());
-                                    TextView v2 = (TextView) tableRow.getChildAt(1);
-                                    Log.v(TAG, "Photo: " + v2.getText().toString());
-                                    //addNewContact();
-                                    addNewPhoto(v1.getText().toString(), v2.getText().toString(), "no", "1", "Passport");
-                                    stk.removeViewAt(i);
-                                    break;
+                checkBox.setOnClickListener(new View.OnClickListener() {
+                    @Override public void onClick(View v) {
+                        int rowCount = stk.getChildCount();
+                        for (int i = 0; i < rowCount; i++) {
+                            View rowView = stk.getChildAt(i);
+                            if (rowView instanceof TableRow) {
+                                TableRow tableRow = (TableRow) rowView;
+                                int columnCount = tableRow.getChildCount();
+                                for (int j = 0; j < columnCount; j++) {
+                                    View columnView = tableRow.getChildAt(j);
+                                    if (columnView instanceof CheckBox) {
+                                        CheckBox checkboxView = (CheckBox) columnView;
+                                        if (checkboxView.isChecked()) {
+                                            TextView v1 = (TextView) tableRow.getChildAt(0);
+                                            Log.v(TAG, "Adding ID: " + v1.getText().toString());
+                                            TextView v2 = (TextView) tableRow.getChildAt(1);
+                                            Log.v(TAG, "Adding Photo: " + v2.getText().toString());
+                                            addNewPhoto(v1.getText().toString(), v2.getText().toString(), "no", "1", "Passport");
+                                            stk.removeViewAt(i);
+                                            break;
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    }
-                }
+                        }                    }
+                });
             }
         });
 
@@ -418,7 +410,7 @@ public class start_main extends AppCompatActivity {
                                 // If columns is a checkbox and checked then save the row number in list.
                                 CheckBox checkboxView = (CheckBox) columnView;
                                 if (checkboxView.isChecked()) {
-                                    final String cp = current_ea + "/Photos/" + current_user;
+                                    final String cp = current_ea + "/" + current_user + "/Photos";
                                     TextView firstTextView = (TextView) tableRow.getChildAt(0);
                                     String firstText = firstTextView.getText().toString();
                                     Log.v(TAG, "Searching for : " + firstText);
@@ -429,7 +421,7 @@ public class start_main extends AppCompatActivity {
                                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                                     if (task.isSuccessful()) {
                                                         Log.v(TAG, "Search success");
-                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        for (DocumentSnapshot document : task.getResult()) {
                                                             Log.v(TAG, document.getId() + " => " + document.getData());
                                                             db.collection(cp).document(document.getId()).delete();
                                                         }

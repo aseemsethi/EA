@@ -62,28 +62,7 @@
                     android:text="Del" />
             </TableRow>
             <View android:layout_height="5dp" />
-            <TableRow
-                android:id="@+id/table_layout_row_4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <Button
-                    android:id="@+id/table_layout_save_row_button"
-                    android:layout_width="0dip"
-                    android:layout_column="1"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_corner"
-                    android:text="Save" />
-                <Button
-                    android:id="@+id/table_layout_order_row_button"
-                    android:layout_width="0dip"
-                    android:layout_column="2"
-                    android:layout_marginRight="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_corner"
-                    android:text="Order" />
 
-            </TableRow>
 
             <View android:layout_height="2dp"
                 android:layout_marginTop="5dp"
@@ -99,9 +78,16 @@
                     android:layout_width="0dip"
                     android:layout_column="0"
                     android:layout_marginRight="5dp"
-                    android:layout_weight="1"
+                    android:layout_weight="1.5"
                     android:text="Orders" />
-
+                <Button
+                    android:id="@+id/table_layout_order_row_button"
+                    android:layout_width="0dip"
+                    android:layout_column="0"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_corner"
+                    android:text="Order" />
                 <Button
                     android:id="@+id/table_layout_newOrder_row_button"
                     android:layout_width="0dip"

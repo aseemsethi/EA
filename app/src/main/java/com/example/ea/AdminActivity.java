@@ -107,9 +107,125 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
-        // DB Get from FireCloud - Checked User's Photos
-        Button photosB = (Button) findViewById(R.id.table_layout_photos_row_buttonA);
+        // DB Get from FireCloud - All Photos
+        Button photosB = (Button) findViewById(R.id.table_layout_allPhotos_row_buttonA);
         photosB.setOnClickListener(new View.OnClickListener() {
+            List<String> allPhotos = new ArrayList<String>();
+            List<String> allUsers = new ArrayList<String>();
+            @Override public void onClick(View v) {
+                v.startAnimation(buttonClick);
+                Log.v(TAG, "Get All Photos DB entries");
+                deleteAllTableRows();
+                clearOrdersScreen();
+
+                // Get a User from the DB for this EA
+                db.collection(current_ea).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Map<String, Object> map = document.getData();
+                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                            if(entry.getKey().toString().equals("Name")) {
+                                                Log.d(TAG, entry.getValue().toString());
+                                                // Now get this User's Photos
+                                                String cp = current_ea + "/" + entry.getValue().toString() + "/Photos";
+                                                db.collection(cp).get()
+                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                        Map<String, Object> map = document.getData();
+                                                                        allPhotos.add(document.getData().get("photoNo").toString());
+                                                                        allPhotos.add(document.getData().get("photoText").toString());
+                                                                        addPhotosRow(allPhotos);
+                                                                        allPhotos.clear();
+                                                                    }
+                                                                } else {
+                                                                    Log.w(TAG, "All Photos - get User's Photo - Error", task.getException());
+                                                                }
+                                                            }
+                                                        });
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Log.w(TAG, "All Photos - get User - Error", task.getException());
+                                }
+                            }
+                        });
+
+
+            }
+        });
+
+        // DB Get from FireCloud - All Orders of all Users
+        Button ordersB = (Button) findViewById(R.id.table_layout_allOrders_row_buttonA);
+        ordersB.setOnClickListener(new View.OnClickListener() {
+            List<String> allPhotos = new ArrayList<String>();
+            List<String> allUsers = new ArrayList<String>();
+            @Override public void onClick(View v) {
+                v.startAnimation(buttonClick);
+                Log.v(TAG, "Get All Photos DB entries");
+                deleteAllTableRows();
+                clearOrdersScreen();
+
+                // Get a User from the DB for this EA
+                db.collection(current_ea).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                        Map<String, Object> map = document.getData();
+                                        for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                            if(entry.getKey().toString().equals("Name")) {
+                                                Log.d(TAG, entry.getValue().toString());
+                                                // Now get this User's Photos
+                                                String cp = current_ea + "/" + entry.getValue().toString() + "/Photos";
+                                                db.collection(cp).get()
+                                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                            @Override public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                        if (document.getData().get("order").toString().equals("yes")) {
+                                                                            allPhotos.add(document.getData().get("photoNo").toString());
+                                                                            allPhotos.add(document.getData().get("photoText").toString());
+                                                                            addPhotosRow(allPhotos);
+                                                                            allPhotos.clear();
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    Log.w(TAG, "All Photos - get User's Order - Error", task.getException());
+                                                                }
+                                                            }
+                                                        });
+
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    Log.w(TAG, "All Photos - get User - Error", task.getException());
+                                }
+                            }
+                        });
+
+
+            }
+        });
+
+
+
+
+        // DB Get from FireCloud - Checked User's Photos
+        Button photosC = (Button) findViewById(R.id.table_layout_photos_row_buttonA);
+        photosC.setOnClickListener(new View.OnClickListener() {
             List<String> allPhotos = new ArrayList<String>();
             @Override public void onClick(View v) {
                 v.startAnimation(buttonClick);
@@ -152,8 +268,8 @@ public class AdminActivity extends AppCompatActivity {
         });
 
         // DB Get from FireCloud - Ordered User's Photos
-        Button ordersB = (Button) findViewById(R.id.table_layout_orders_row_buttonA);
-        ordersB.setOnClickListener(new View.OnClickListener() {
+        Button ordersC = (Button) findViewById(R.id.table_layout_orders_row_buttonA);
+        ordersC.setOnClickListener(new View.OnClickListener() {
             List<String> allPhotos = new ArrayList<String>();
             String docID = null;
             @Override public void onClick(View v) {

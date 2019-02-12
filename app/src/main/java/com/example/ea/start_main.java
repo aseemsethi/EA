@@ -108,41 +108,6 @@ public class start_main extends AppCompatActivity {
         addNewContact();
         // Check whether this current_user is continuing as admin
         Integer isAdmin = extras.getInt("adminLogin");
-        if (isAdmin == 1) {
-            current_admin = current_user;
-            Log.v(TAG, "admin status: " + current_admin);
-            // Check if current_user is the admin of this Establishment current_ea
-            // The admin setting of True for an EA is done manually by the App Developer
-            DocumentReference docRef = db.collection(current_ea).document(current_user);
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                            if ((document.getData().get("adminFor")) == null) {
-                                Log.d(TAG, "User is not an admin");
-                                Toast toast = Toast.makeText(start_main.this, "User is not Admin",
-                                        Toast.LENGTH_LONG);
-                                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
-                                toast.show();
-                                finish(); return;
-                            }
-                            Log.d(TAG, "Admin for: " + document.getData().get("adminFor").toString());
-                            Log.d(TAG, "User is an admin");
-                            if (document.getData().get("adminFor").equals(current_ea)) {
-                                startAdmin();
-                            }
-                        } else {
-                            Log.d(TAG, "No such document");
-                        }
-                    } else {
-                        Log.d(TAG, "get failed with ", task.getException());
-                    }
-                }
-            });
-        }
         String uid1 = extras.getString("uid1");
         if (uid1 != null) {
             Log.v(TAG, "UID: " + uid1);
@@ -331,7 +296,12 @@ public class start_main extends AppCompatActivity {
 
                 deleteAllTableRows();
                 // Bring up the Order View
-                if ((photoName == null) || (photoNum == null)) return;
+                if ((photoName == null) || (photoNum == null)) {
+                    Toast toast = Toast.makeText(start_main.this, "Click on SHOW and select a photo first",
+                            Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                    toast.show(); return;
+                }
                 final RelativeLayout r = findViewById(R.id.guest_layout_main);
                 LayoutInflater linflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View myView = linflater.inflate(R.layout.order, (ViewGroup) r, false); //here item is the the layout you want to inflate
@@ -543,16 +513,6 @@ public class start_main extends AppCompatActivity {
             width = (int) (height * bitmapRatio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
-    }
-    private void startAdmin() {
-        Intent i = new Intent(start_main.this, AdminActivity.class);
-        i.putExtra("user", current_user);
-        i.putExtra("uid", current_uid);
-        i.putExtra("ea", current_ea);
-        Log.v(TAG, "Starting Admin Activity");
-        startActivity(i);
-        finish();
-        // finish the current activity, so a return from admin activity returns to home
     }
 
     private void deleteAllTableRows() {

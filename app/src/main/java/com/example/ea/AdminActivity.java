@@ -115,6 +115,12 @@ public class AdminActivity extends AppCompatActivity {
                 v.startAnimation(buttonClick);
                 Log.v(TAG, "Get Database entries");
                 checkedUser = getCheckedRow();
+                if (checkedUser == null) {
+                    Toast toast = Toast.makeText(AdminActivity.this, "Please select User",
+                            Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                    toast.show(); return;
+                }
                 deleteAllTableRows();
                 clearOrdersScreen();
                 addCheckedUser();
@@ -154,6 +160,12 @@ public class AdminActivity extends AppCompatActivity {
                 v.startAnimation(buttonClick);
                 Log.v(TAG, "Get Database entries");
                 checkedUser = getCheckedRow();
+                if (checkedUser == null) {
+                    Toast toast = Toast.makeText(AdminActivity.this, "Please select User",
+                            Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                    toast.show(); return;
+                }
                 deleteAllTableRows();
                 addCheckedUser();  // This is header Row with User Name
 
@@ -186,7 +198,7 @@ public class AdminActivity extends AppCompatActivity {
                                         }
                                     }
                                     Toast toast = Toast.makeText(AdminActivity.this, "Orders Task completed",
-                                            Toast.LENGTH_LONG);
+                                            Toast.LENGTH_SHORT);
                                     toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
                                     toast.show();
                                 } else {

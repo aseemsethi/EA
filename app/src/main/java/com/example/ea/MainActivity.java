@@ -127,23 +127,48 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(i);
             }
         });
+
         Button continue_admin = (Button)findViewById(R.id.continue_admin);
         continue_admin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseUser user = mAuth.getCurrentUser();
-                Log.v(TAG, "Name: " + user.getDisplayName() + " : " + user.getUid());
-                Intent i = new Intent(MainActivity.this, start_main.class);
-                i.putExtra("user1", user.getDisplayName());
-                i.putExtra("uid1", user.getUid());
-                i.putExtra("ea", ea);
-                i.putExtra("adminLogin", 1);
-                if (TextUtils.isEmpty(ea)) {
-                    Toast.makeText(getBaseContext(), "Please select Establishment",
-                            Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                startActivity(i);
+                final FirebaseUser user = mAuth.getCurrentUser();
+                DocumentReference docRef = db.collection(ea).document(user.getDisplayName());
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d(TAG, "Admin User: " + document.getData());
+                                if ((document.getData().get("adminFor")) == null) {
+                                    Log.d(TAG, "User is not an admin");
+                                    Toast toast = Toast.makeText(MainActivity.this, "User is not Admin",
+                                            Toast.LENGTH_LONG);
+                                    toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                                    toast.show();
+                                    finish(); return;
+                                }
+                                Log.d(TAG, "Admin for: " + document.getData().get("adminFor").toString());
+                                Log.d(TAG, "User is an admin");
+                                if (document.getData().get("adminFor").equals(ea)) {
+                                    Intent i = new Intent(MainActivity.this, AdminActivity.class);
+                                    i.putExtra("user", user.getDisplayName());
+                                    i.putExtra("uid", user.getUid());
+                                    i.putExtra("ea", ea);
+                                    Log.v(TAG, "Starting Admin Activity");
+                                    startActivity(i);
+                                } else {
+                                    Log.v(TAG, "User is not admin for this Shop");
+                                }
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
             }
         });
 
@@ -312,6 +337,7 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.continue_admin).setVisibility(View.VISIBLE);
             findViewById(R.id.textView1).setVisibility(View.VISIBLE);
             findViewById(R.id.spinner1).setVisibility(View.VISIBLE);
+            findViewById(R.id.contactT).setVisibility(View.VISIBLE);
             Log.w(TAG, "UpdateUI: update name and pic");
         } else {
             displayName.setVisibility(View.GONE);
@@ -322,6 +348,7 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.continue_admin).setVisibility(View.GONE);
             findViewById(R.id.textView1).setVisibility(View.GONE);
             findViewById(R.id.spinner1).setVisibility(View.GONE);
+            findViewById(R.id.contactT).setVisibility(View.GONE);
             Log.w(TAG, "UpdateUI: update name and pic - failed");
         }
     }

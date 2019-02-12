@@ -30,42 +30,52 @@
                 android:layout_height="wrap_content">
 
                 <Button
-                    android:id="@+id/table_layout_users_row_buttonA"
+                    android:id="@+id/usersAdminNC"
                     android:layout_width="0dip"
                     android:layout_column="0"
-                    android:layout_weight="1"
-                    android:background="@drawable/rounded_corner_admin"
+                    android:layout_weight="1.2"
                     android:layout_marginRight="10dp"
-                    android:text="All Users" />
+                    android:text="Users" />
 
                 <Button
-                    android:id="@+id/table_layout_allPhotos_row_buttonA"
+                    android:id="@+id/table_layout_users_row_buttonA"
                     android:layout_width="0dip"
                     android:layout_column="1"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
-                    android:text="All Photos" />
+                    android:text="All" />
+
                 <Button
-                    android:id="@+id/table_layout_allOrders_row_buttonA"
+                    android:id="@+id/table_layout_allPhotos_row_buttonA"
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
-                    android:text="All Orders" />
+                    android:layout_marginRight="10dp"
+                    android:text="Photos" />
+                <Button
+                    android:id="@+id/table_layout_allOrders_row_buttonA"
+                    android:layout_width="0dip"
+                    android:layout_column="3"
+                    android:layout_weight="1"
+                    android:background="@drawable/rounded_corner_admin"
+                    android:text="Orders" />
             </TableRow>
-
+            <View android:layout_height="2dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/colorPrimary"/>
             <TableRow
-                android:id="@+id/table_layout_admin1"
+                android:id="@+id/table_layout_admin2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <Button
                     android:id="@+id/table_layout_singleUser_row_buttonA"
                     android:layout_width="0dip"
                     android:layout_column="0"
-                    android:layout_weight="1"
+                    android:layout_weight="1.2"
                     android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
                     android:text="Per User" />
 
                 <Button
@@ -75,7 +85,6 @@
                     android:layout_weight="1"
                     android:background="@drawable/rounded_corner_admin"
                     android:layout_marginRight="10dp"
-                    android:layout_marginTop="10dp"
                     android:text="Orders" />
 
                 <Button
@@ -83,7 +92,6 @@
                     android:layout_width="0dip"
                     android:layout_column="2"
                     android:layout_weight="1"
-                    android:layout_marginTop="10dp"
                     android:background="@drawable/rounded_corner_admin"
                     android:text="Photos" />
             </TableRow>
